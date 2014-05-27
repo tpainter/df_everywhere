@@ -401,8 +401,22 @@ if __name__ == "__main__":
     server = serverFromString(reactor, "tcp:7081")
     server.listen(transport_factory)
     
-    window_handle = get_windows_bytitle("Dwarf Fortress")
-    shot = screenshot(window_handle[0], debug = False)
+    #Change screenshot method based on operating system
+    from sys import platform as _platform
+    if _platform == "linux" or _platform == "linux2":
+        print("Linux unsuported at this time. Exiting..."
+        exit()
+    elif _platform == "darwin":
+        print("OS X unsuported at this time. Exiting..."
+        exit()
+    elif _platform == "win32":
+        # Windows..
+        window_handle = get_windows_bytitle("Dwarf Fortress")
+        shot = screenshot(window_handle[0], debug = False)
+    else:
+        print("Unsuported platform detected. Exiting..."
+        exit()
+    
     shot = trim(shot, debug = False)
     tile_x, tile_y = findTileSize(shot)
     local_file = findLocalImg(tile_x, tile_y)
