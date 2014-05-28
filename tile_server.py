@@ -376,9 +376,36 @@ def findLocalImg(x, y):
     else:
         print("Found tileset image: %s" % fileList_sorted[0][1])
         return fileList_sorted[0][1]
+
+from autobahn.twisted.wamp import ApplicationSession        
+class SubpubTileset(ApplicationSession):
+    """
+    An application component that subscribes and receives events.
+    """
+    
+    def __init__(self, realm = "realm1"):
+        ApplicationSession.__init__(self)
+        self._realm = realm
+        
+    def onConnect(self):
+        self.join(self._realm)
+        
+    def onJoin(self, details):
+        if not self in self.factory._myConnection:
+            self.factory._myConnection.append(self)
+        
+        self.received = 0
+        
+    def onLeave(self, details):
+        if self in self.factory._myConnection:
+            self.factory._myConnection.remove(self)
+        self.disconnect()
     
     
 if __name__ == "__main__":
+    #a fake class to create empty objects
+    class expando(object): pass
+    client_self = expando()
     from time import sleep
     
     from twisted.internet import reactor
@@ -401,20 +428,54 @@ if __name__ == "__main__":
     server = serverFromString(reactor, "tcp:7081")
     server.listen(transport_factory)
     
+    ## Set up webserver to tileset image
+    from twisted.web.static import File
+    resource = File('./')
+    from twisted.web.server import Site
+    site = Site(resource)
+    reactor.listenTCP(7080, site)
+    
+    #Start WAMP client
+    from twisted.internet.endpoints import clientFromString
+    
+    ## create a WAMP application session factory
+    from autobahn.twisted.wamp import ApplicationSessionFactory
+    session_factory = ApplicationSessionFactory()
+    
+    ## .. and set the session class on the factory
+    session_factory._myConnection = []
+    session_factory.session = SubpubTileset
+    
+    ## create a WAMP-over-WebSocket transport client factory
+    from autobahn.twisted.websocket import WampWebSocketClientFactory
+    transport_factory = WampWebSocketClientFactory(session_factory, "ws://127.0.0.1:7081/ws", debug = False)
+    transport_factory.setProtocolOptions(failByDrop = False)
+    
+    ## start a WebSocket client from an endpoint
+    client = clientFromString(reactor, "tcp:127.0.0.1:7081")
+    client.connect(transport_factory)
+    
+    #self.wamp = session_factory._myConnection
+    client_self.wamp = session_factory._myConnection
+    
+    #wait for a while to make sure that the WAMP connection is running, then add subscription
+    #reactor.callLater(5, self.subscribe_heartbeats, "cb.map." + mainconfig.env_control + ".heartbeats")
+    
+    
     #Change screenshot method based on operating system
     from sys import platform as _platform
     if _platform == "linux" or _platform == "linux2":
-        print("Linux unsuported at this time. Exiting..."
+        print("Linux unsuported at this time. Exiting...")
         exit()
     elif _platform == "darwin":
-        print("OS X unsuported at this time. Exiting..."
+        print("OS X unsuported at this time. Exiting...")
         exit()
     elif _platform == "win32":
         # Windows..
         window_handle = get_windows_bytitle("Dwarf Fortress")
         shot = screenshot(window_handle[0], debug = False)
     else:
-        print("Unsuported platform detected. Exiting..."
+        print("Unsuported platform detected. Exiting...")
         exit()
     
     shot = trim(shot, debug = False)
@@ -429,6 +490,11 @@ if __name__ == "__main__":
         shot = trim(shot, debug = False)
         tileMap = tset.parseImage(shot)
         print("tileMap created.")
+        if len(client_self.wamp) > 0:
+            client_self.wamp[0].publish("df_anywhere.1",tileMap)
+            print("Published tilemap.")
+        else:
+            print("Waiting for WAMP connection.")
         
         if (tick < tickMax):
             reactor.callLater(.2, keepGoing, tick + 1)
