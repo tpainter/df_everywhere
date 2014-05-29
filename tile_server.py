@@ -261,7 +261,7 @@ class Tileset:
             for x_start in range(tiles_x):
                 tile = img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))       
                 
-                #Use the hash of the tile as a key to insure that it is unique
+                #Use the hash of the tile as a key to ensure that it is unique
                 tile_hash = self._imageHash(tile)
                 
                 if tile_hash in self.tileDict:
@@ -491,10 +491,16 @@ if __name__ == "__main__":
         tileMap = tset.parseImage(shot)
         print("tileMap created.")
         if len(client_self.wamp) > 0:
-            client_self.wamp[0].publish("df_anywhere.1",tileMap)
+            client_self.wamp[0].publish("df_anywhere.1.map",tileMap)
             print("Published tilemap.")
         else:
             print("Waiting for WAMP connection.")
+            
+        #Periodically publish the latest tileset filename
+        if tick % 5 == 0:
+            if len(client_self.wamp) > 0:
+                client_self.wamp[0].publish("df_anywhere.1.tileset", tset.filename)
+                print("Published tileset.")
         
         if (tick < tickMax):
             reactor.callLater(.2, keepGoing, tick + 1)
