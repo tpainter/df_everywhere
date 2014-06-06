@@ -68,6 +68,9 @@ class Tileset:
         
         self.tile_x = tile_x
         self.tile_y = tile_y
+        self.screen_x = 0
+        self.screen_y = 0
+        
         if filename is None:
             #fake a filename
             self.filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, 0)
@@ -245,6 +248,8 @@ class Tileset:
         """
         tileMap = []
         image_x, image_y = img.size
+        self.screen_x = image_x
+        self.screen_y = image_y
         
         x = 0
         y = 0    
@@ -501,6 +506,14 @@ if __name__ == "__main__":
             if len(client_self.wamp) > 0:
                 client_self.wamp[0].publish("df_anywhere.1.tileset", tset.filename)
                 print("Published tileset.")
+        
+        #Periodically publish the screen size
+        if tick % 5 == 1:
+            if len(client_self.wamp) > 0:
+                client_self.wamp[0].publish("df_anywhere.1.screensize", (tset.screen_x, tset.screen_y))
+                print("Published tileset.")
+        
+        
         
         if (tick < tickMax):
             reactor.callLater(.2, keepGoing, tick + 1)
