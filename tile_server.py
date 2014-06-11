@@ -24,7 +24,10 @@ def screenshot(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
     """
-    import ImageGrab
+    try:
+        import ImageGrab
+    except:
+        from PIL import ImageGrab
     import win32gui
     from time import sleep
     
@@ -64,7 +67,10 @@ class Tileset:
     """
     
     def __init__(self, filename, tile_x, tile_y, debug = False):
-        import Image
+        try:
+            import Image
+        except:
+            from PIL import Image
         
         self.tile_x = tile_x
         self.tile_y = tile_y
@@ -182,7 +188,10 @@ class Tileset:
         """
         Adds new tile to tileset.
         """
-        import Image
+        try:
+            import Image
+        except:
+            from PIL import Image
         
         #Check that proposed tile matches the tile size of the set
         pTile_x, pTile_y = img.size
@@ -311,8 +320,12 @@ def trim(im, debug = False):
     """ 
     Automatically crops a solid color border off of the image.
     """
-    import Image
-    import ImageChops
+    try:
+        import Image
+        import ImageChops
+    except:
+        from PIL import Image
+        from PIL import ImageChops
         
     bg = Image.new(im.mode, im.size, "black")
     diff = ImageChops.difference(im, bg)
