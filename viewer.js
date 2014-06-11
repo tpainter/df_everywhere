@@ -33,16 +33,19 @@ function Tileset(tile_x, tile_y){
     }
 }
 
+var tileset_image = new Image;
+function update_tileset(fname){
+    tileset_image.src = fname;
+}
+
 var test_array = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
                   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
                   32, 33, 34];
                   
 
-var tileset = new Tileset(16, 16);
+var tileset = new Tileset(12, 12);
 
 $(document).ready( function(){    
-    
-    var tileset_image = new Image;
     var div = document.getElementById('compare');
     
     tileset_image.onload = function(){
@@ -52,10 +55,9 @@ $(document).ready( function(){
         tileset.tiles_y = this.height / tileset.tile_y;
         tileset.loaded = true;
         tileset.img = this;
-        
-        div.appendChild(tileset_image); //for comparison
-    }
-    tileset_image.src = 'tilesets/Phoebus_16x16.png';    
+    }   
+    
+    tileset_image.src = "12x12-00913.png"
     
     ctx = $('#gameboard')[0].getContext("2d");
     ctx.canvas.width = 256;
@@ -78,4 +80,29 @@ function tileWait(){
         setTimeout(tileWait, .25 * 1000);
     }
 }
+
+try {
+   var autobahn = require('autobahn');
+} catch (e) {
+   // when running in browser, AutobahnJS will
+   // be included without a module system
+}
+
+var connection = new autobahn.Connection({
+   url: 'ws://127.0.0.1:7081/ws',
+   //url: 'ws://192.168.0.20:7081/ws',
+   realm: 'realm1'}
+);
+
+//Setup Autobahn for WAMP connection
+connection.onopen = function (session) {
+   //subscribe to tilemap
+   session.subscribe("df_anywhere.1.map", displayStats);
+   
+   //subscribe to tileset updates
+   session.subscribe("df_anywhere.1.tileset", update_tileset);
+   
+};
+
+connection.open();  
 
