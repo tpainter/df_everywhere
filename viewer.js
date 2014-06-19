@@ -35,7 +35,14 @@ function Tileset(tile_x, tile_y){
 
 var tileset_image = new Image;
 function update_tileset(fname){
+    console.log("Updating tileset name");
     tileset_image.src = fname;
+}
+
+function update_screensize(screen_x, screen_y) {
+    console.log("Updating screen size");
+    ctx.canvas.width = screen_x;
+    ctx.canvas.height = screen_y;
 }
 
 var test_array = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -63,7 +70,7 @@ $(document).ready( function(){
     ctx.canvas.width = 256;
     ctx.canvas.height = 256;
     
-    tileWait();
+    //tileWait();
 });
 
 function tileWait(){
@@ -81,6 +88,22 @@ function tileWait(){
     }
 }
 
+function draw_image(tile_map){
+    if (tileset.loaded){
+        console.log("drawing map");
+        ctx.canvas.width = ctx.canvas.width;
+        var i = 0;
+        for (elem in tile_map){
+            tileset.drawTile(tile_map[elem], i);
+            i++;
+        }
+        setInterval(tileWait, .2 * 1000);
+    } else {
+        console.log("waiting");
+    }
+    
+}
+
 try {
    var autobahn = require('autobahn');
 } catch (e) {
@@ -96,13 +119,17 @@ var connection = new autobahn.Connection({
 
 //Setup Autobahn for WAMP connection
 connection.onopen = function (session) {
+    console.log("WAMP connection open...");
+
    //subscribe to tilemap
-   session.subscribe("df_anywhere.1.map", displayStats);
+   session.subscribe("df_anywhere.1.map", draw_image);
    
    //subscribe to tileset updates
    session.subscribe("df_anywhere.1.tileset", update_tileset);
    
+   //subscribe to screensize updates
+   session.subscribe("df_anywhere.1.screensize", update_screensize);
+   
 };
 
-connection.open();  
-
+connection.open();
