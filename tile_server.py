@@ -17,9 +17,10 @@ class SubpubTileset(ApplicationSession):
     An application component that subscribes and receives events.
     """
     
-    def __init__(self, realm = "realm1"):
+    def __init__(self, realm = 'realm1'):
         ApplicationSession.__init__(self)
-        self._realm = realm
+        #This was needed for it to work on one computer... but not others? Strange.
+        self._realm = 'realm1'
         
     def onConnect(self):
         self.join(self._realm)
@@ -27,8 +28,6 @@ class SubpubTileset(ApplicationSession):
     def onJoin(self, details):
         if not self in self.factory._myConnection:
             self.factory._myConnection.append(self)
-        
-        self.received = 0
         
     def onLeave(self, details):
         if self in self.factory._myConnection:
@@ -43,10 +42,15 @@ if __name__ == "__main__":
     
     import utils
     from tileset import Tileset
+    
+    from twisted.python import log
+    import sys
+    log.startLogging(sys.stdout)
 
     #a fake class to create empty objects
     class expando(object): pass
     client_self = expando()
+    #client_self.wamp = []
     from time import sleep
     
     from twisted.internet import reactor
@@ -89,7 +93,7 @@ if __name__ == "__main__":
     
     ## create a WAMP-over-WebSocket transport client factory
     from autobahn.twisted.websocket import WampWebSocketClientFactory
-    transport_factory = WampWebSocketClientFactory(session_factory, "ws://127.0.0.1:7081/ws", debug = False)
+    transport_factory = WampWebSocketClientFactory(session_factory, "ws://127.0.0.1:7081/ws", debug = False, debug_wamp = False)
     transport_factory.setProtocolOptions(failByDrop = False)
     
     ## start a WebSocket client from an endpoint
@@ -98,6 +102,7 @@ if __name__ == "__main__":
     
     #self.wamp = session_factory._myConnection
     client_self.wamp = session_factory._myConnection
+    #client_self.wamp.append(session_factory._myConnection)
     
     #wait for a while to make sure that the WAMP connection is running, then add subscription
     #reactor.callLater(5, self.subscribe_heartbeats, "cb.map." + mainconfig.env_control + ".heartbeats")
@@ -132,7 +137,7 @@ if __name__ == "__main__":
         tileMap = tset.parseImage(shot)
         print("tileMap created.")
         if len(client_self.wamp) > 0:
-            client_self.wamp[0].publish("df_anywhere.1.map",tileMap)
+            client_self.wamp[0].publish("df_anywhere.g1.map",tileMap)
             print("Published tilemap.")
         else:
             print("Waiting for WAMP connection.")
@@ -140,13 +145,13 @@ if __name__ == "__main__":
         #Periodically publish the latest tileset filename
         if tick % 5 == 0:
             if len(client_self.wamp) > 0:
-                client_self.wamp[0].publish("df_anywhere.1.tileset", tset.filename)
+                client_self.wamp[0].publish("df_anywhere.g1.tileset", tset.filename)
                 print("Published tileset.")
         
         #Periodically publish the screen size
         if tick % 5 == 1:
             if len(client_self.wamp) > 0:
-                client_self.wamp[0].publish("df_anywhere.1.screensize", (tset.screen_x, tset.screen_y))
+                client_self.wamp[0].publish("df_anywhere.g1.screensize", (tset.screen_x, tset.screen_y))
                 print("Published tileset.")
         
         
