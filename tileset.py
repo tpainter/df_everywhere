@@ -157,7 +157,7 @@ class Tileset:
         #Find if a new row needs to be created in the image
         if self.tileCount + 1 > maxTiles_x * tiles_y:
             #need to add another row to tileset image
-            newTileSet = Image.new(self.tileset.mode, (maxTiles_x * self.tile_x, tiles_y * self.tile_y + tile_y), "white")
+            newTileSet = Image.new(self.tileset.mode, (maxTiles_x * self.tile_x, tiles_y * self.tile_y + self.tile_y), "white")
         else:
             #No need to add new row
             if self.tileset is not None:

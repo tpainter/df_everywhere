@@ -67,19 +67,19 @@ function draw_image(tile_map){
             column = 0;
         }
     } else {
-        console.log("waiting");
+        console.log("Waiting for tileset to load.");
     }
     
 }
 
 function update_tileset(fname){
     
-    if (fname[0] != tileset_image.src){
-        console.log("Updating tileset name.");
-        tileset_image.src = fname[0];
+    if (tileset_image.src.indexOf(fname[0]) > -1){
+        console.log("Tileset name update not needed.");
     }
     else {
-        console.log("Tileset name update not needed.");
+        console.log("Updating tileset name.");
+        tileset_image.src = fname[0];
     }
 }
 
