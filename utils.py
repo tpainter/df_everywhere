@@ -28,21 +28,31 @@ def screenshot(hwnd = None, debug = False):
     except:
         from PIL import ImageGrab
     import win32gui
+    import win32con
+    
     from time import sleep
     
     if not hwnd:
         print("Unable to get window. Exiting.")
         exit()
     
-    win32gui.SetForegroundWindow(hwnd)
     bbox_total = win32gui.GetWindowRect(hwnd)
     bbox_client = win32gui.GetClientRect(hwnd) #window without the title bar, but in 'local' window coordinates
+    
+    #win32gui.SetForegroundWindow(hwnd)
+    # Move window to top (i.e. "ensure that it is not coverd") without giving it focus.
+    flags = win32con.SWP_NOACTIVATE
+    
+    win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, bbox_total[0], bbox_total[1], bbox_total[2] - bbox_total[0], bbox_total[3] - bbox_total[0], flags)
+    win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, bbox_total[0], bbox_total[1], bbox_total[2] - bbox_total[0], bbox_total[3] - bbox_total[0], flags)
+    
+    
     #bbox points are [start_x, start_y, stop_x, stop_y]
     #added extra number to make it work on my system... need to look into this - seems to be a 4px border
     diff_x = (bbox_total[2] - bbox_total[0]) - bbox_client[2] - 4
     diff_y = (bbox_total[3] - bbox_total[1]) - bbox_client[3] - 4
     bbox = [bbox_total[0] + diff_x, bbox_total[1] + diff_y, bbox_total[0] + diff_x + bbox_client[2], bbox_total[1] + diff_y + bbox_client[3]] 
-    sleep(.2) #wait for window to be brought to front
+    #sleep(.2) #wait for window to be brought to front
     img = ImageGrab.grab(bbox)
     
     if debug:
