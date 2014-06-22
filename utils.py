@@ -1,12 +1,12 @@
 
-
+#Windows only - get screenshot of window instead of whole screen
+# from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
+    
 
 def get_windows_bytitle(title_text, exact = False):    
     """
     Gets details of window position by title text. [Windows Only]
     """
-    #Windows only - get screenshot of window instead of whole screen
-    # from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
     
     import win32gui
     
