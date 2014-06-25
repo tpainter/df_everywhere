@@ -1,7 +1,6 @@
 
 var ctx;
 
-
 function Tileset(tile_x, tile_y){
     
     this.tileset_x;
@@ -123,8 +122,7 @@ connection.onopen = function (session) {
    session.subscribe("df_anywhere.g1.tileset", update_tileset);
    
    //subscribe to screensize updates
-   session.subscribe("df_anywhere.g1.screensize", update_screensize);
-   
+   session.subscribe("df_anywhere.g1.screensize", update_screensize);   
    
 };
 
