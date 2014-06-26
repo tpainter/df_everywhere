@@ -106,14 +106,19 @@ try {
 }
 
 var connection = new autobahn.Connection({
-   url: 'ws://127.0.0.1:7081/ws',
-   //url: 'ws://192.168.0.20:7081/ws',
+   //url: 'ws://127.0.0.1:7081/ws',
+   url: 'ws://192.168.0.20:7081/ws',
    realm: 'realm1'}
 );
+
+//Set up variable to use to publish events from other functions
+var wamp_session = false;
 
 //Setup Autobahn for WAMP connection
 connection.onopen = function (session) {
     console.log("WAMP connection open...");
+    
+    wamp_session = true;
 
    //subscribe to tilemap
    session.subscribe("df_anywhere.g1.map", draw_image);

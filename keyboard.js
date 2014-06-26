@@ -1,11 +1,18 @@
 
 
 function sendKey(toSend) {
-    //Just send the text string, the server handles checking its validity
-    connection.session.publish("df_everywhere.g1.commands", toSend);
-    console.log(toSend);
+    //Ensure that a wamp connection has been setup
+    if (wamp_session) {
+        //Just send the text string, the server handles checking its validity
+        connection.session.publish("df_everywhere.g1.commands", [toSend]);
+        console.log(toSend);
+    }
+    else {
+    console.log("No connection to send to.");
+    };
 };
 
+//Override from Mousetrap documents
 /**
 * Overwrites default Mousetrap.bind method to optionally accept
 * an object to bind multiple key events in a single call
