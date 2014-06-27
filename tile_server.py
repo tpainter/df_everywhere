@@ -2,38 +2,6 @@
 
 
     
-
-        
-
-
-
-
-    
-
-
-from autobahn.twisted.wamp import ApplicationSession        
-class SubpubTileset(ApplicationSession):
-    """
-    An application component that subscribes and receives events.
-    """
-    
-    def __init__(self, realm = 'realm1'):
-        ApplicationSession.__init__(self)
-        #This was needed for it to work on one computer... but not others? Strange.
-        self._realm = 'realm1'
-        
-    def onConnect(self):
-        self.join(self._realm)
-        
-    def onJoin(self, details):
-        if not self in self.factory._myConnection:
-            self.factory._myConnection.append(self)
-        
-    def onLeave(self, details):
-        if self in self.factory._myConnection:
-            self.factory._myConnection.remove(self)
-        self.disconnect()
-    
     
 if __name__ == "__main__":
     """
@@ -42,6 +10,7 @@ if __name__ == "__main__":
     
     import utils
     from tileset import Tileset
+    from subpubTileset import SubpubTileset
     
     from twisted.python import log
     import sys
@@ -51,6 +20,7 @@ if __name__ == "__main__":
     class expando(object): pass
     client_self = expando()
     #client_self.wamp = []
+    
     from time import sleep
     
     from twisted.internet import reactor
@@ -88,21 +58,20 @@ if __name__ == "__main__":
     session_factory = ApplicationSessionFactory()
     
     ## .. and set the session class on the factory
+    from autobahn.twisted.wamp import ApplicationSession   
     session_factory._myConnection = []
     session_factory.session = SubpubTileset
     
     ## create a WAMP-over-WebSocket transport client factory
     from autobahn.twisted.websocket import WampWebSocketClientFactory
-    transport_factory = WampWebSocketClientFactory(session_factory, "ws://127.0.0.1:7081/ws", debug = False, debug_wamp = False)
+    transport_factory = WampWebSocketClientFactory(session_factory, "ws://127.0.0.1:7081/ws", debug = False)
     transport_factory.setProtocolOptions(failByDrop = False)
     
     ## start a WebSocket client from an endpoint
     client = clientFromString(reactor, "tcp:127.0.0.1:7081")
     client.connect(transport_factory)
     
-    #self.wamp = session_factory._myConnection
     client_self.wamp = session_factory._myConnection
-    #client_self.wamp.append(session_factory._myConnection)
     
     #wait for a while to make sure that the WAMP connection is running, then add subscription
     #reactor.callLater(5, self.subscribe_heartbeats, "cb.map." + mainconfig.env_control + ".heartbeats")
@@ -153,8 +122,6 @@ if __name__ == "__main__":
             if len(client_self.wamp) > 0:
                 client_self.wamp[0].publish("df_anywhere.g1.screensize", (tset.screen_x, tset.screen_y))
                 print("Published tileset.")
-        
-        
         
         if (tick < tickMax):
             reactor.callLater(.2, keepGoing, tick + 1)
