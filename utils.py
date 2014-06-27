@@ -29,9 +29,7 @@ def screenshot(hwnd = None, debug = False):
         from PIL import ImageGrab
     import win32gui
     import win32con
-    
-    from time import sleep
-    
+        
     if not hwnd:
         print("Unable to get window. Exiting.")
         exit()
