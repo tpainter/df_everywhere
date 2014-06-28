@@ -1,6 +1,5 @@
 
-#Windows only - get screenshot of window instead of whole screen
-# from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
+
     
 
 def get_windows_bytitle(title_text, exact = False):    
@@ -24,14 +23,67 @@ def screenshot(hwnd = None, debug = False):
     Takes a screenshot of only the area given by the window.
     """
     try:
+        import Image
+    except:
+        from PIL import Image
+    import win32gui
+    import win32ui
+    from ctypes import windll
+        
+    if not hwnd:
+        print("Unable to get window. Exiting.")
+        exit()
+    
+    left, top, right, bot = win32gui.GetClientRect(hwnd)
+    w = right - left
+    h = bot - top
+    
+    hwndDC = win32gui.GetWindowDC(hwnd)
+    mfcDC  = win32ui.CreateDCFromHandle(hwndDC)
+    saveDC = mfcDC.CreateCompatibleDC()
+    
+    saveBitMap = win32ui.CreateBitmap()
+    saveBitMap.CreateCompatibleBitmap(mfcDC, w, h)
+    
+    saveDC.SelectObject(saveBitMap)
+    
+    result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 1)
+    
+    bmpinfo = saveBitMap.GetInfo()
+    bmpstr = saveBitMap.GetBitmapBits(True)
+    
+    img = Image.frombuffer(
+        'RGB',
+        (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
+        bmpstr, 'raw', 'BGRX', 0, 1)
+    
+    win32gui.DeleteObject(saveBitMap.GetHandle())
+    saveDC.DeleteDC()
+    mfcDC.DeleteDC()
+    win32gui.ReleaseDC(hwnd, hwndDC)
+
+    if result == 1:
+        #PrintWindow Succeeded
+        #img.save("test.png")
+        return img
+    
+      
+    
+        
+def screenshot_old(hwnd = None, debug = False):
+    """
+    Takes a screenshot of only the area given by the window.
+    """
+    #Windows only - get screenshot of window instead of whole screen
+    # from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
+    
+    try:
         import ImageGrab
     except:
         from PIL import ImageGrab
     import win32gui
     import win32con
-    
-    from time import sleep
-    
+        
     if not hwnd:
         print("Unable to get window. Exiting.")
         exit()
@@ -126,6 +178,11 @@ def trim(im, debug = False):
     """ 
     Automatically crops a solid color border off of the image.
     """
+    
+    #If an image wasn't passed, then don't even try to do anything
+    if im is None:
+        return None
+    
     try:
         import Image
         import ImageChops
