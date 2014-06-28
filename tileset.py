@@ -1,15 +1,17 @@
 
+try:
+    import Image
+except:
+    from PIL import Image
+    
+import hashlib
 
 class Tileset:
     """
     Holds details for the tileset.
     """
     
-    def __init__(self, filename, tile_x, tile_y, debug = False):
-        try:
-            import Image
-        except:
-            from PIL import Image
+    def __init__(self, filename, tile_x, tile_y, debug = False):        
         
         self.tile_x = tile_x
         self.tile_y = tile_y
@@ -58,7 +60,6 @@ class Tileset:
         """
         Creates a dictionary from the tileset image.
         """
-        import hashlib
         
         if img is None:
             img = self.tileset
@@ -130,10 +131,6 @@ class Tileset:
         """
         Adds new tile to tileset.
         """
-        try:
-            import Image
-        except:
-            from PIL import Image
         
         #Check that proposed tile matches the tile size of the set
         pTile_x, pTile_y = img.size
@@ -253,7 +250,6 @@ class Tileset:
         """
         Returns a hash of the image.
         """
-        import hashlib
         
         #Use md5 since this isn't a secure application and speed is helpful.
         #md5 is 32 characters, img.tostring() for 12x12 is 432 characters
