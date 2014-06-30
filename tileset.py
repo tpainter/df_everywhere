@@ -24,7 +24,7 @@ class Tileset:
             img = None
         else:
             self.filename = filename
-            img = Image.open(filename)
+            img = Image.open("./html/tilesets/%s" % filename)
             
         self.debug = debug        
         self.tileset = img        
@@ -180,7 +180,7 @@ class Tileset:
         #write new image file to disk
         filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
         print("Saving new tileset image: %s" % filename)
-        newTileSet.save(filename)
+        newTileSet.save("./html/tilesets/%s" % filename)
         
         #reload new tileset
         self.tileCount += 1

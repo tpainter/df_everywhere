@@ -5,6 +5,7 @@ if __name__ == "__main__":
     """
     When run directly, it finds Dwarf Fortress window
     """  
+    from sys import platform as _platform
     from twisted.internet import reactor
     from twisted.web.static import File
     from twisted.web.server import Site
@@ -32,12 +33,8 @@ if __name__ == "__main__":
     #Start WAMP client
     #client_self = wamp_local.wampClient("ws://127.0.0.1:7081/ws", "tcp:127.0.0.1:7081")
     client_self = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
-        
-    #wait for a while to make sure that the WAMP connection is running, then add subscription
-    #reactor.callLater(5, self.subscribe_heartbeats, "cb.map." + mainconfig.env_control + ".heartbeats")
-    
-    #Change screenshot method based on operating system
-    from sys import platform as _platform
+            
+    #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
         print("Linux unsuported at this time. Exiting...")
         exit()

@@ -78,7 +78,7 @@ function update_tileset(fname){
     }
     else {
         console.log("Updating tileset name.");
-        tileset_image.src = fname[0];
+        tileset_image.src = "./tilesets/" + fname[0];
     }
 }
 
