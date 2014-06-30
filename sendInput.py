@@ -2,10 +2,19 @@
 # Converts submitted command string to a key command to "type" into a window
 #
 #
+import win32con
+import win32api
 
-class CommandSanitize:
+class sendInput:
+    """
+    Converts received commands (text) and sends them to the window after sanitation.
+    """
     
-    def __init__(self):
+    def __init__(self, hwnd):
+        #The window that commands are sent to
+        self.hwnd = hwnd
+        
+        #Codes to use with SendKeys
         self._command = { 'a': 'a',
                         'b': 'b',
                         'c': 'c',
@@ -32,32 +41,32 @@ class CommandSanitize:
                         'x': 'x',
                         'y': 'y',
                         'z': 'z',
-                        'A': 'A',
-                        'B': 'B',
-                        'C': 'C',
-                        'D': 'D',
-                        'E': 'E',
-                        'F': 'F',
-                        'G': 'G',
-                        'H': 'H',
-                        'I': 'I',
-                        'J': 'J',
-                        'K': 'K',
-                        'L': 'L',
-                        'M': 'M',
-                        'N': 'N',
-                        'O': 'O',
-                        'P': 'P',
-                        'Q': 'Q',
-                        'R': 'R',
-                        'S': 'S',
-                        'T': 'T',
-                        'U': 'U',
-                        'V': 'V',
-                        'W': 'W',
-                        'X': 'X',
-                        'Y': 'Y',
-                        'Z': 'Z',
+                        'A': '+a',
+                        'B': '+b',
+                        'C': '+c',
+                        'D': '+d',
+                        'E': '+e',
+                        'F': '+f',
+                        'G': '+g',
+                        'H': '+h',
+                        'I': '+i',
+                        'J': '+j',
+                        'K': '+k',
+                        'L': '+l',
+                        'M': '+m',
+                        'N': '+n',
+                        'O': '+o',
+                        'P': '+p',
+                        'Q': '+q',
+                        'R': '+r',
+                        'S': '+s',
+                        'T': '+t',
+                        'U': '+u',
+                        'V': '+v',
+                        'W': '+w',
+                        'X': '+x',
+                        'Y': '+y',
+                        'Z': '+y',
                         '0': '0',
                         '1': '1',
                         '2': '2',
@@ -114,6 +123,24 @@ class CommandSanitize:
                         'down': 'down',
         }
     
-    def convertCommand(self, command):
+    def _sanitizeCommand(self, dirtyCommand):
         #return command from dictionary. If it doesn't exist, return 'None'
         return self._command.get(command, None)
+    
+    def _sendCommand(cleanCommand):
+        #This makes the window active and sends keyboard events directly.
+        #Windows only.
+        
+        win32gui.SetForegroundWindow(self.hwnd)
+        SendKeys.SendKeys(cleanCommand)
+        
+        
+    def receiveCommand(self, dirtyCommand):
+        """
+        Sanitizes command then sends it to window.
+        """
+        print("received: %s" % dirtyCommand)
+        cleanCommand = self._sanitizeCommand(dirtyCommand)
+        if cleanCommand is not None:
+            self._sendCommand(cleanCommand, hwnd)
+        

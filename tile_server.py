@@ -17,7 +17,8 @@ if __name__ == "__main__":
     
     import wamp_local
     
-    need_wamp_server = True
+    debug_all = False
+    need_wamp_server = False
     
     if need_wamp_server:
         #Start WAMP server
@@ -29,7 +30,8 @@ if __name__ == "__main__":
     reactor.listenTCP(7080, site)
     
     #Start WAMP client
-    client_self = wamp_local.wampClient("ws://127.0.0.1:7081/ws", "tcp:127.0.0.1:7081")
+    #client_self = wamp_local.wampClient("ws://127.0.0.1:7081/ws", "tcp:127.0.0.1:7081")
+    client_self = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
         
     #wait for a while to make sure that the WAMP connection is running, then add subscription
     #reactor.callLater(5, self.subscribe_heartbeats, "cb.map." + mainconfig.env_control + ".heartbeats")
@@ -55,16 +57,18 @@ if __name__ == "__main__":
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
         
-    tickMax = 40
+    tickMax = 80
     
     def keepGoing(tick):
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
         tileMap = tset.parseImage(shot)
-        print("tileMap created.")
+        if debug_all:
+            print("tileMap created.")
         if len(client_self) > 0:
             client_self[0].publish("df_anywhere.g1.map",tileMap)
-            print("Published tilemap.")
+            if debug_all:
+                print("Published tilemap.")
         else:
             print("Waiting for WAMP connection.")
             
@@ -72,15 +76,18 @@ if __name__ == "__main__":
         if tick % 5 == 0:
             if len(client_self) > 0:
                 client_self[0].publish("df_anywhere.g1.tileset", tset.filename)
-                print("Published tileset.")
+                if debug_all:
+                    print("Published tileset.")
         
         #Periodically publish the screen size
         if tick % 5 == 1:
             if len(client_self) > 0:
                 client_self[0].publish("df_anywhere.g1.screensize", (tset.screen_x, tset.screen_y))
-                print("Published tileset.")
+                if debug_all:
+                    print("Published tileset.")
         
         if (tick < tickMax):
+            print("Tick...")
             reactor.callLater(.2, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")

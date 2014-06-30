@@ -118,7 +118,8 @@ var wamp_session = false;
 connection.onopen = function (session) {
     console.log("WAMP connection open...");
     
-    wamp_session = true;
+    //wamp_session = true;
+    wamp_session = session;
 
    //subscribe to tilemap
    session.subscribe("df_anywhere.g1.map", draw_image);
