@@ -1,13 +1,24 @@
 
 
+try:
+    import Image
+    import ImageChops
+except:
+    from PIL import Image
+    from PIL import ImageChops
+
+import win32gui
+import win32gui
+import win32ui
+from ctypes import windll
+import os
     
 
 def get_windows_bytitle(title_text, exact = False):    
     """
     Gets details of window position by title text. [Windows Only]
-    """
+    """   
     
-    import win32gui
     
     def _window_callback(hwnd, all_windows):
         all_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -21,15 +32,8 @@ def get_windows_bytitle(title_text, exact = False):
 def screenshot(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
-    """
-    try:
-        import Image
-    except:
-        from PIL import Image
-    import win32gui
-    import win32ui
-    from ctypes import windll
-        
+    """    
+     
     if not hwnd:
         print("Unable to get window. Exiting.")
         exit()
@@ -77,11 +81,6 @@ def screenshot_old(hwnd = None, debug = False):
     #Windows only - get screenshot of window instead of whole screen
     # from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
     
-    try:
-        import ImageGrab
-    except:
-        from PIL import ImageGrab
-    import win32gui
     import win32con
         
     if not hwnd:
@@ -126,7 +125,7 @@ def findLocalImg(x, y):
     """
     Try to find the best local tileset based on tile dimensions
     """
-    import os
+    
     
     fileList = []
     filePrefix = "%02dx%02d-" % (x, y)
@@ -182,13 +181,6 @@ def trim(im, debug = False):
     #If an image wasn't passed, then don't even try to do anything
     if im is None:
         return None
-    
-    try:
-        import Image
-        import ImageChops
-    except:
-        from PIL import Image
-        from PIL import ImageChops
         
     bg = Image.new(im.mode, im.size, "black")
     diff = ImageChops.difference(im, bg)
