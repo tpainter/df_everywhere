@@ -12,6 +12,8 @@ if __name__ == "__main__":
     import utils
     import tileset
     
+    from twisted.internet.defer import inlineCallbacks
+    
     from twisted.python import log
     import sys
     log.startLogging(sys.stdout)        
@@ -54,7 +56,8 @@ if __name__ == "__main__":
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
         
-    tickMax = 80
+    tickMax = 40
+    
     
     def keepGoing(tick):
         shot = utils.screenshot(window_handle[0], debug = False)
@@ -62,13 +65,15 @@ if __name__ == "__main__":
         tileMap = tset.parseImage(shot)
         if debug_all:
             print("tileMap created.")
+            
         if len(client_self) > 0:
             client_self[0].publish("df_anywhere.g1.map",tileMap)
             if debug_all:
                 print("Published tilemap.")
         else:
             print("Waiting for WAMP connection.")
-            
+        
+                    
         #Periodically publish the latest tileset filename
         if tick % 5 == 0:
             if len(client_self) > 0:

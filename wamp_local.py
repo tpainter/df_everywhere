@@ -45,7 +45,8 @@ def wampClient(wampAddress, wampClientEndpoint):
     session_factory.session = SubpubTileset
     
     ## create a WAMP-over-WebSocket transport client factory    
-    transport_factory = WampWebSocketClientFactory(session_factory, wampAddress, debug = False)
+    #transport_factory = WampWebSocketClientFactory(session_factory, wampAddress, debug = False)
+    transport_factory = WampWebSocketClientFactory(session_factory, wampAddress, debug = False, debug_wamp = False)
     transport_factory.setProtocolOptions(failByDrop = False)
     
     ## start a WebSocket client from an endpoint
