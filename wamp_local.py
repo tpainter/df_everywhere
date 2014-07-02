@@ -10,7 +10,36 @@ from autobahn.twisted.wamp import ApplicationSession
 from autobahn.twisted.websocket import WampWebSocketClientFactory
 
 
-from subpubTileset import SubpubTileset
+from autobahn.twisted.wamp import ApplicationSession
+from twisted.internet.defer import inlineCallbacks
+      
+class SubpubTileset(ApplicationSession):
+    """
+    An application component that subscribes and receives events.
+    """
+    
+    def __init__(self, realm = 'realm1'):
+        ApplicationSession.__init__(self)
+        #This was needed for it to work on one computer... but not others? Strange.
+        self._realm = 'realm1'
+        
+    def onConnect(self):
+        self.join(self._realm)
+    
+    #@inlineCallbacks
+    def onJoin(self, details):
+        if not self in self.factory._myConnection:
+            self.factory._myConnection.append(self)
+            
+                 
+
+        #yield self.subscribe(sendInput.receiveCommand, 'df_everywhere.g1.commands')
+        
+        
+    def onLeave(self, details):
+        if self in self.factory._myConnection:
+            self.factory._myConnection.remove(self)
+        self.disconnect()
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """
