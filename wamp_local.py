@@ -11,7 +11,6 @@ from autobahn.twisted.websocket import WampWebSocketClientFactory
 
 
 from autobahn.twisted.wamp import ApplicationSession
-from twisted.internet.defer import inlineCallbacks
       
 class SubpubTileset(ApplicationSession):
     """
@@ -26,20 +25,24 @@ class SubpubTileset(ApplicationSession):
     def onConnect(self):
         self.join(self._realm)
     
-    #@inlineCallbacks
     def onJoin(self, details):
         if not self in self.factory._myConnection:
             self.factory._myConnection.append(self)
             
-                 
-
-        #yield self.subscribe(sendInput.receiveCommand, 'df_everywhere.g1.commands')
-        
-        
     def onLeave(self, details):
         if self in self.factory._myConnection:
             self.factory._myConnection.remove(self)
         self.disconnect()
+        
+class WampHolder:
+    """
+    Container for references to WAMP client connections and subscriptions.
+    """
+    
+    def __init__(self):
+        self.connection = []
+        self.subscriptions = []
+        
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """

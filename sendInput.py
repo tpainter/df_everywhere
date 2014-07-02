@@ -141,6 +141,8 @@ class SendInput:
         """
         print("received: %s" % dirtyCommand)
         cleanCommand = self._sanitizeCommand(dirtyCommand)
+        print(cleanCommand)
         if cleanCommand is not None:
+            print("cleaned: %s" % cleanCommand)
             self._sendCommand(cleanCommand, hwnd)
         
