@@ -2,6 +2,7 @@
 
 
 from autobahn.twisted.wamp import ApplicationSession
+from twisted.internet.defer import inlineCallbacks
 
 import sendInput
       
@@ -18,12 +19,14 @@ class SubpubTileset(ApplicationSession):
     def onConnect(self):
         self.join(self._realm)
     
-       
+    #@inlineCallbacks
     def onJoin(self, details):
         if not self in self.factory._myConnection:
             self.factory._myConnection.append(self)
             
-        #self.subscribe(sendInput.receiveCommand, "df_anywhere.g1.commands")
+                 
+
+        #yield self.subscribe(sendInput.receiveCommand, 'df_everywhere.g1.commands')
         
         
     def onLeave(self, details):

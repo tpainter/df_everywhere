@@ -5,7 +5,7 @@
 import win32con
 import win32api
 
-class sendInput:
+class SendInput:
     """
     Converts received commands (text) and sends them to the window after sanitation.
     """
