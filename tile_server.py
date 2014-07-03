@@ -60,7 +60,7 @@ if __name__ == "__main__":
     
     localCommands = sendInput.SendInput(window_handle)
     
-    tickMax = 40
+    tickMax = 80
     
     @inlineCallbacks
     def keepGoing(tick):
@@ -90,10 +90,11 @@ if __name__ == "__main__":
                 if debug_all:
                     print("Published tileset.")
         
-        #Periodically publish the screen size
+        #Periodically publish the screen size and tile size
         if tick % 5 == 1:
             if len(client.connection) > 0:
-                client.connection[0].publish("df_anywhere.g1.screensize", (tset.screen_x, tset.screen_y))
+                client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
+                client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
                 if debug_all:
                     print("Published tileset.")
         

@@ -29,8 +29,7 @@ function Tileset(tile_x, tile_y){
     }
 }
 
-var tileset_image = new Image;               
-
+var tileset_image = new Image;
 var tileset = new Tileset(16, 16);
 
 $(document).ready( function(){    
@@ -47,13 +46,12 @@ $(document).ready( function(){
         
     ctx = $('#gameboard')[0].getContext("2d");
     ctx.canvas.width = 80 * 16;
-    ctx.canvas.height = 25 * 16;
-    
+    ctx.canvas.height = 25 * 16;    
 });
 
 function draw_image(tile_map){
     if (tileset.loaded){
-        console.log("drawing map");
+        console.log("Drawing map.");
         var row = 0;
         var column = 0;
         tile_map = tile_map[0];
@@ -67,18 +65,30 @@ function draw_image(tile_map){
         }
     } else {
         console.log("Waiting for tileset to load.");
-    }
-    
+    }    
 }
 
-function update_tileset(fname){
-    
+function update_tileset(fname){    
     if (tileset_image.src.indexOf(fname[0]) > -1){
         console.log("Tileset name update not needed.");
     }
     else {
-        console.log("Updating tileset name.");
+        console.log("Updating tileset name:" + fname[0]);
         tileset_image.src = "./tilesets/" + fname[0];
+    }
+}
+
+function update_tilesize(dims){    
+    //dims is [x_pixels, y_pixels]
+    tile_x = dims[0][0];
+    tile_y = dims[0][1];
+    
+    if (tile_x != tileset.tile_x || tile_y != tilese.tile_y){
+        //Update tileset with new tile size
+        tileset = new Tileset(tile_x, tile_y); 
+    }
+    else {
+        console.log("Tile size update not needed.");
     }
 }
 
@@ -88,14 +98,12 @@ function update_screensize(dims) {
     screen_y = dims[0][1];
     
     if (screen_x != ctx.canvas.width || screen_y != ctx.canvas.height){
-        console.log("Updating screen size.");
-        ctx.canvas.width = screen_x[0];
-        ctx.canvas.height = screen_y[0];
+        ctx.canvas.width = screen_x;
+        ctx.canvas.height = screen_y;
     }
     else {
         console.log("Screen size update not needed.");
-    }
-    
+    }    
 }
 
 try {
@@ -126,6 +134,9 @@ connection.onopen = function (session) {
    
    //subscribe to tileset updates
    session.subscribe("df_anywhere.g1.tileset", update_tileset);
+   
+   //subscribe to tile size updates
+   session.subscribe("df_anywhere.g1.tilesize", update_tilesize);
    
    //subscribe to screensize updates
    session.subscribe("df_anywhere.g1.screensize", update_screensize);   

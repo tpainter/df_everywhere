@@ -2,8 +2,7 @@
 # Converts submitted command string to a key command to "type" into a window
 #
 #
-import win32con
-import win32api
+import win32gui
 
 class SendInput:
     """
@@ -125,13 +124,16 @@ class SendInput:
     
     def _sanitizeCommand(self, dirtyCommand):
         #return command from dictionary. If it doesn't exist, return 'None'
-        return self._command.get(command, None)
+        return self._command.get(dirtyCommand, None)
     
-    def _sendCommand(cleanCommand):
+    def _sendCommand(self, cleanCommand):
         #This makes the window active and sends keyboard events directly.
         #Windows only.
         
-        win32gui.SetForegroundWindow(self.hwnd)
+        #Debugger
+        #import pdb; pdb.set_trace()
+        result = win32gui.SetForegroundWindow(self.hwnd)
+        print("Setforeground succeeded: %s" % result)
         SendKeys.SendKeys(cleanCommand)
         
         
@@ -141,8 +143,7 @@ class SendInput:
         """
         print("received: %s" % dirtyCommand)
         cleanCommand = self._sanitizeCommand(dirtyCommand)
-        print(cleanCommand)
+        print("cleaned: %s" % cleanCommand)
         if cleanCommand is not None:
-            print("cleaned: %s" % cleanCommand)
-            self._sendCommand(cleanCommand, hwnd)
+            self._sendCommand(cleanCommand)
         
