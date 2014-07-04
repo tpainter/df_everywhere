@@ -35,8 +35,11 @@ if __name__ == "__main__":
     
     #Start WAMP client
     client = wamp_local.WampHolder()
-    #client_self = wamp_local.wampClient("ws://127.0.0.1:7081/ws", "tcp:127.0.0.1:7081")
-    client.connection = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
+    if need_wamp_server:
+        #Connect to local server
+        client.connection = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
+    else:
+        client.connection = wamp_local.wampClient("ws://dfeverywhere.com:7081/ws", "tcp:dfeverywhere.com:7081")
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":

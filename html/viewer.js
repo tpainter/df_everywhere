@@ -115,7 +115,8 @@ try {
 
 var connection = new autobahn.Connection({
    //url: 'ws://127.0.0.1:7081/ws',
-   url: 'ws://192.168.0.20:7081/ws',
+   //url: 'ws://192.168.0.20:7081/ws',
+   url: 'ws://dfeverywhere.com:7081/ws',
    realm: 'realm1'}
 );
 
