@@ -148,10 +148,11 @@ class Tileset:
         
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
-                
+        
+        #Number of tiles to place across the width of the tileset image
         maxTiles_x = 32
         
-        #Find if a new row needs to be created in the image
+        #Check if a new row needs to be created in the image
         if self.tileCount + 1 > maxTiles_x * tiles_y:
             #need to add another row to tileset image
             newTileSet = Image.new(self.tileset.mode, (maxTiles_x * self.tile_x, tiles_y * self.tile_y + self.tile_y), "white")
@@ -177,21 +178,27 @@ class Tileset:
         new_y = newTilePosition / maxTiles_x * self.tile_y
         newTileSet.paste(img, (new_x, new_y))
         
-        #write new image file to disk
         filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
-        print("Saving new tileset image: %s" % filename)
-        newTileSet.save("./html/tilesets/%s" % filename)
         
         #reload new tileset
         self.tileCount += 1
         self.filename = filename
         self._loadSet(newTileSet)
+    
+    def _saveSet(self):
+        """
+        Saves tileset image to disk
+        """
+        
+        print("Saving new tileset image: %s" % self.filename)
+        self.tileset.save("./html/tilesets/%s" % self.filename)
         
     def parseImage(self, img):
         """
         Parses an image. Returns list of tile positions in map.
         """
         tileMap = []
+        tileSetChanged = False
         image_x, image_y = img.size
         self.screen_x = image_x
         self.screen_y = image_y
@@ -224,6 +231,7 @@ class Tileset:
                 else:
                     row.append(-1)
                     self._addTileToSet(tile)
+                    tileSetChanged = True
                         
             tileMap.append(row)
         
@@ -243,6 +251,11 @@ class Tileset:
                     others += 1    
         
             print("Parse: duplicates: %d ones: %d nones: %d others: %d" % (duplicates, ones, nones, others))
+        
+        if tileSetChanged:
+            #If new tiles were added, save the file to disk.
+            #Do this here so that each new tile isn't saved.
+            self._saveSet()
             
         return tileMap
         
