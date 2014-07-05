@@ -133,6 +133,7 @@ class SendInput:
         #Debugger
         #import pdb; pdb.set_trace()
         result = win32gui.SetForegroundWindow(self.hwnd)
+        win32gui.SetFocus(self.hwnd)
         print("Setforeground succeeded: %s" % result)
         SendKeys.SendKeys(cleanCommand)
         
