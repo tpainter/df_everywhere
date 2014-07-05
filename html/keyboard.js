@@ -5,7 +5,7 @@ function sendKey(toSend) {
     if (wamp_session) {
         //Just send the text string, the server handles checking its validity
         console.log(toSend);
-        wamp_session.publish('df_everywhere.g1.commands', ['test']);
+        //wamp_session.publish('df_everywhere.g1.commands', ['test']);
         wamp_session.publish('df_everywhere.g1.commands', [toSend]);
     }
     else {
