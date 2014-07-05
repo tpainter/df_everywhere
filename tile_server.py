@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
         if shot is not None:
             #Only send a full tile map every 5 ticks, otherwise just send changes
-            if tick + 1 % 5 == 0:
+            if (tick + 1) % 5 == 0:
                 tileMap = tset.parseImage(shot, returnFullMap = True)
             else:
                 tileMap = tset.parseImage(shot, returnFullMap = False)

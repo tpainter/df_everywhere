@@ -281,12 +281,11 @@ class Tileset:
             changes = 0
             for i in xrange(len(newMap)):
                 if newMap[i] == self.fullMap[i]:
-                    differenceMap[i] = -2
+                    differenceMap.append(-2)
                 else:
-                    differenceMap[i] = newMap[i]
+                    differenceMap.append(newMap[i])
                     changes += 1
             
-            print("Sending difference map with %d changes" % changes)
             return differenceMap
         
     def _imageHash(self, img):
