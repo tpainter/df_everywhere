@@ -51,11 +51,12 @@ if __name__ == "__main__":
         exit()
     
     shot = utils.trim(shot, debug = False)
+    #It is possible that shot can be "None". Need to handle this gracefully... Try it another way?
     tile_x, tile_y = utils.findTileSize(shot)
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
     
-    localCommands = sendInput.SendInput(window_handle)
+    localCommands = sendInput.SendInput(window_handle[0])
     
     runContinuously = True
     tickMax = 80
@@ -64,12 +65,13 @@ if __name__ == "__main__":
     def keepGoing(tick):
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
-        
-        #Only send a full tile map every 5 ticks, otherwise just send changes
-        if tick + 1 % 5 == 0:
-            tileMap = tset.parseImage(shot, returnFullMap = True)
-        else:
-            tileMap = tset.parseImage(shot, returnFullMap = False)
+
+        if shot is not None:
+            #Only send a full tile map every 5 ticks, otherwise just send changes
+            if tick + 1 % 5 == 0:
+                tileMap = tset.parseImage(shot, returnFullMap = True)
+            else:
+                tileMap = tset.parseImage(shot, returnFullMap = False)
             
         if debug_all:
             print("tileMap created.")
