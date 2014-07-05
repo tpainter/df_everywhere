@@ -15,20 +15,25 @@ function Tileset(tile_x, tile_y){
     this.loaded = false;
     
     this.drawTile = function (tileNum, drawPos){
-        //drawPos is [row, column]
-        var t_row = Math.floor(tileNum / this.tiles_x);
-        var t_column = tileNum % this.tiles_x;
-                
-        var sx = t_column * this.tile_x;
-        var sy = t_row * this.tile_y;
-        var swidth = this.tile_x;
-        var sheight = this.tile_y;
-        var x = drawPos[1] * this.tile_x;
-        var y = drawPos[0] * this.tile_y;
-        var width = this.tile_x;
-        var height = this.tile_y;
-        
-        ctx.drawImage(this.img,sx,sy,swidth,sheight,x,y,width,height);        
+        if (tileNum === -2){
+            //tile didn't change, pass
+        }
+        else {
+            //drawPos is [row, column]
+            var t_row = Math.floor(tileNum / this.tiles_x);
+            var t_column = tileNum % this.tiles_x;
+                    
+            var sx = t_column * this.tile_x;
+            var sy = t_row * this.tile_y;
+            var swidth = this.tile_x;
+            var sheight = this.tile_y;
+            var x = drawPos[1] * this.tile_x;
+            var y = drawPos[0] * this.tile_y;
+            var width = this.tile_x;
+            var height = this.tile_y;
+            
+            ctx.drawImage(this.img,sx,sy,swidth,sheight,x,y,width,height);
+        }
     }
 }
 

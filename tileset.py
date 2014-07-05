@@ -19,6 +19,8 @@ class Tileset:
         self.screen_x = 0
         self.screen_y = 0
         
+        self.fullMap = []
+        
         if filename is None:
             #fake a filename
             self.filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, 0)
@@ -194,7 +196,7 @@ class Tileset:
         print("Saving new tileset image: %s" % self.filename)
         self.tileset.save("./html/tilesets/%s" % self.filename)
         
-    def parseImage(self, img):
+    def parseImage(self, img, returnFullMap = True):
         """
         Parses an image. Returns list of tile positions in map.
         """
@@ -258,7 +260,34 @@ class Tileset:
             #Do this here so that each new tile isn't saved.
             self._saveSet()
             
-        return tileMap
+        if returnFullMap:
+            #Update fullMap
+            self.fullMap[:] = []
+            self.fullMap.extend(tileMap)
+            return tileMap
+        else:
+            return self._tileMapDifference(tileMap)
+        
+    def _tileMapDifference(self, newMap):
+        """
+        Compares newMap to latest fullMap. Returns newMap with '-2' in positions that didn't change.
+        """
+        
+        if len(newMap) != len(self.fullMap):
+            #Map may have changed dimensions
+            return newMap
+        else:
+            differenceMap = []
+            changes = 0
+            for i in xrange(len(newMap)):
+                if newMap[i] == self.fullMap[i]:
+                    differenceMap[i] = -2
+                else:
+                    differenceMap[i] = newMap[i]
+                    changes += 1
+            
+            print("Sending difference map with %d changes" % changes)
+            return differenceMap
         
     def _imageHash(self, img):
         """
