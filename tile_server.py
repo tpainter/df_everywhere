@@ -55,7 +55,7 @@ if __name__ == "__main__":
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
     
-    localCommands = sendInput.SendInput(window_handle)
+    localCommands = sendInput.SendInput(window_handle[0])
     
     runContinuously = True
     tickMax = 80

@@ -3,6 +3,7 @@
 #
 #
 import win32gui
+import SendKeys
 
 class SendInput:
     """
@@ -108,34 +109,31 @@ class SendInput:
                         '|': '|',
                         '}': '}',
                         '~': '~',
-                        'tab': 'tab',
-                        'enter': 'enter',
-                        'esc': 'esc',
-                        'space': 'space',
-                        'pageup': 'pageup',
-                        'pagedown': 'pagedown',
-                        'end': 'end',
-                        'home': 'home',
-                        'left': 'left',
-                        'up': 'up',
-                        'right': 'right',
-                        'down': 'down',
+                        'tab': '{TAB}',
+                        'enter': '{ENTER}',
+                        'esc': '{ESC}',
+                        'space': '{SPACE}',
+                        'pageup': '{PGUP}',
+                        'pagedown': '{PGDN}',
+                        'end': '{END}',
+                        'home': '{HOME}',
+                        'left': '{LEFT}',
+                        'up': '{UP}',
+                        'right': '{RIGHT}',
+                        'down': '{DOWN}',
         }
     
     def _sanitizeCommand(self, dirtyCommand):
         #return command from dictionary. If it doesn't exist, return 'None'
         return self._command.get(dirtyCommand, None)
     
-    def _sendCommand(self, cleanCommand):
+    def _sendCommand(self, com):
         #This makes the window active and sends keyboard events directly.
         #Windows only.
         
-        #Debugger
-        #import pdb; pdb.set_trace()
         result = win32gui.SetForegroundWindow(self.hwnd)
-        win32gui.SetFocus(self.hwnd)
-        print("Setforeground succeeded: %s" % result)
-        SendKeys.SendKeys(cleanCommand)
+        #win32gui.SetFocus(self.hwnd)
+        SendKeys.SendKeys(com)
         
         
     def receiveCommand(self, dirtyCommand):
