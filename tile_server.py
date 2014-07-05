@@ -57,6 +57,7 @@ if __name__ == "__main__":
     
     localCommands = sendInput.SendInput(window_handle)
     
+    runContinuously = True
     tickMax = 80
     
     @inlineCallbacks
@@ -100,7 +101,7 @@ if __name__ == "__main__":
                 if debug_all:
                     print("Published screensize.")
         
-        if (tick < tickMax):
+        if (tick < tickMax or runContinuously):
             print("Tick...")
             reactor.callLater(.2, keepGoing, tick + 1)
         else:
