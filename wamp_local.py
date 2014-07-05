@@ -19,7 +19,6 @@ class SubpubTileset(ApplicationSession):
     
     def __init__(self, realm = 'realm1'):
         ApplicationSession.__init__(self)
-        #This was needed for it to work on one computer... but not others? Strange.
         self._realm = 'realm1'
         
     def onConnect(self):
@@ -42,6 +41,7 @@ class WampHolder:
     def __init__(self):
         self.connection = []
         self.subscriptions = []
+        self.rpcs = []
         
 
 def wampServ(wampAddress, wampPort, wampDebug = False):

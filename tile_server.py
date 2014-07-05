@@ -7,8 +7,6 @@ if __name__ == "__main__":
     """  
     from sys import platform as _platform
     from twisted.internet import reactor
-    from twisted.web.static import File
-    from twisted.web.server import Site
     import utils
     import tileset
     import sendInput
@@ -28,11 +26,7 @@ if __name__ == "__main__":
         #Start WAMP server
         wamp_local.wampServ("ws://localhost:7081/ws", "tcp:7081", False)
     
-    ## Set up webserver to tileset image    
-    resource = File('./')    
-    site = Site(resource)
-    reactor.listenTCP(7080, site)
-    
+        
     #Start WAMP client
     client = wamp_local.WampHolder()
     if need_wamp_server:
@@ -78,6 +72,11 @@ if __name__ == "__main__":
             d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')
             client.subscriptions.append(d)
             
+        if len(client.connection) > 0 and len(client.rpcs) < 1:
+            #register a rpc once
+            d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.g1.tilesetimage')
+            client.rpcs.append(d)
+            
         if len(client.connection) > 0:
             client.connection[0].publish("df_anywhere.g1.map",tileMap)
             if debug_all:
@@ -99,7 +98,7 @@ if __name__ == "__main__":
                 client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
                 client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
                 if debug_all:
-                    print("Published tileset.")
+                    print("Published screensize.")
         
         if (tick < tickMax):
             print("Tick...")

@@ -1,3 +1,5 @@
+//Set up variable to use to publish events from other functions
+var wamp_session = false;
 
 var ctx;
 
@@ -9,6 +11,7 @@ function Tileset(tile_x, tile_y){
     this.tiles_y;
     this.tile_x = tile_x;
     this.tile_y = tile_y;
+    this.tileImageName = "none";
     this.loaded = false;
     
     this.drawTile = function (tileNum, drawPos){
@@ -68,13 +71,25 @@ function draw_image(tile_map){
     }    
 }
 
-function update_tileset(fname){    
-    if (tileset_image.src.indexOf(fname[0]) > -1){
+function update_tileset(fname){
+    if (tileset.tileImageName === fname[0]){
         console.log("Tileset name update not needed.");
     }
     else {
         console.log("Updating tileset name:" + fname[0]);
-        tileset_image.src = "./tilesets/" + fname[0];
+        tileset.tileImageName = fname[0];
+        //tileset_image.src = "./tilesets/" + fname[0];
+        //Request tileset image via websockets
+        wamp_session.call('df_everywhere.g1.tilesetimage').then(
+            function (str) {
+                console.log("Receiving image data");
+                //tileset_image.src = "data:image/png;base64," + window.btoa(str);
+                tileset_image.src = "data:image/png;base64," + str;
+            },
+            function (error) {
+                console.log("Call failed:", error);
+            }
+        );
     }
 }
 
@@ -120,9 +135,6 @@ var connection = new autobahn.Connection({
    realm: 'realm1'}
 );
 
-//Set up variable to use to publish events from other functions
-var wamp_session = false;
-
 //Setup Autobahn for WAMP connection
 connection.onopen = function (session) {
     console.log("WAMP connection open...");
@@ -140,8 +152,7 @@ connection.onopen = function (session) {
    session.subscribe("df_anywhere.g1.tilesize", update_tilesize);
    
    //subscribe to screensize updates
-   session.subscribe("df_anywhere.g1.screensize", update_screensize);   
-   
+   session.subscribe("df_anywhere.g1.screensize", update_screensize);
 };
 
 connection.open();

@@ -3,7 +3,8 @@ try:
     import Image
 except:
     from PIL import Image
-    
+
+from cStringIO import StringIO    
 import hashlib
 
 class Tileset:
@@ -267,3 +268,15 @@ class Tileset:
         #Use md5 since this isn't a secure application and speed is helpful.
         #md5 is 32 characters, img.tostring() for 12x12 is 432 characters
         return hashlib.md5(img.tostring()).hexdigest()
+        
+    def wampSend(self):
+        """
+        Converts tileset image to byte string so that it can be send via WAMP.
+        """
+        img_io = StringIO()
+        self.tileset.save(img_io, 'png')
+        img_io.seek(0)
+        #return img_io
+        #can't send binary data directly. Base64 encode first.
+        return img_io.getvalue().encode("base64")
+        

@@ -4,10 +4,7 @@ function sendKey(toSend) {
     //Ensure that a wamp connection has been setup
     if (wamp_session) {
         //Just send the text string, the server handles checking its validity
-        //connection.session.publish("df_everywhere.g1.commands", [toSend]);
-        //connection.session.publish('df_everywhere.g1.commands', ['test']);
         console.log(toSend);
-        //console.log(wamp_session);
         wamp_session.publish('df_everywhere.g1.commands', ['test']);
         wamp_session.publish('df_everywhere.g1.commands', [toSend]);
     }
