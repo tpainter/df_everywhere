@@ -278,13 +278,16 @@ class Tileset:
             return newMap
         else:
             differenceMap = []
-            changes = 0
             for i in xrange(len(newMap)):
-                if newMap[i] == self.fullMap[i]:
-                    differenceMap.append(-2)
-                else:
-                    differenceMap.append(newMap[i])
-                    changes += 1
+                rowDif = []
+                for j in xrange(len(newMap[0])):
+                    if newMap[i][j] == self.fullMap[i][j]:
+                        rowDif.append(-2)
+                        #differenceMap.append(-2)
+                    else:
+                        rowDif.append(newMap[i][j])
+                        #differenceMap.append(newMap[i])
+                differenceMap.append(rowDif)
             
             return differenceMap
         
