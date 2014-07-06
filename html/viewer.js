@@ -40,8 +40,7 @@ function Tileset(tile_x, tile_y){
 var tileset_image = new Image;
 var tileset = new Tileset(16, 16);
 
-$(document).ready( function(){    
-    var div = document.getElementById('compare');
+$(document).ready( function(){
     
     tileset_image.onload = function(){
         tileset.tileset_x = this.width;
@@ -105,6 +104,7 @@ function update_tilesize(dims){
     
     if (tile_x != tileset.tile_x || tile_y != tilese.tile_y){
         //Update tileset with new tile size
+        console.log("Tile size updating.")
         tileset = new Tileset(tile_x, tile_y); 
     }
     else {
@@ -118,6 +118,7 @@ function update_screensize(dims) {
     screen_y = dims[0][1];
     
     if (screen_x != ctx.canvas.width || screen_y != ctx.canvas.height){
+        console.log("Updating screen size.")
         ctx.canvas.width = screen_x;
         ctx.canvas.height = screen_y;
     }
