@@ -6,6 +6,7 @@ if __name__ == "__main__":
     When run directly, it finds Dwarf Fortress window
     """  
     from sys import platform as _platform
+    import time
     from twisted.internet import reactor
     import utils
     import tileset
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     tickMax = 80
     
     @inlineCallbacks
-    def keepGoing(tick):
+    def keepGoing(tick, timeLastTick):
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
 
@@ -110,12 +111,20 @@ if __name__ == "__main__":
                     print("Published screensize.")
         
         if (tick < tickMax or runContinuously):
-            print("Tick...")
-            reactor.callLater(.2, keepGoing, tick + 1)
+            timeNow = time.clock()
+            if timeLastTick - timeNow > 0.2:
+                #Took too long. Immediately call next tick
+                print("Tick...")
+                reactor.callLater(0, keepGoing, tick + 1, timeNow)
+            else:
+                #Call next tick at proper time
+                tickPause = max(0.2 - (timeNow - timeLastTick), 0.001)
+                print("Tick...")
+                reactor.callLater(tickPause, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")
             reactor.stop()
         
-    reactor.callWhenRunning(keepGoing, 0)
+    reactor.callWhenRunning(keepGoing, 0, 0)
     reactor.run()
     
