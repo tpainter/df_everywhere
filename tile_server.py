@@ -125,6 +125,6 @@ if __name__ == "__main__":
             print("Tick limit reached. Exiting...")
             reactor.stop()
         
-    reactor.callWhenRunning(keepGoing, 0, 0)
+    reactor.callWhenRunning(keepGoing, 0, 1)
     reactor.run()
     
