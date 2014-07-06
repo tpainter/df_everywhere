@@ -63,7 +63,7 @@ if __name__ == "__main__":
     tickMax = 80
     
     @inlineCallbacks
-    def keepGoing(tick, timeLastTick):
+    def keepGoing(tick, timeLastTick = 1):
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
 
@@ -125,6 +125,6 @@ if __name__ == "__main__":
             print("Tick limit reached. Exiting...")
             reactor.stop()
         
-    reactor.callWhenRunning(keepGoing, 0, 1)
+    reactor.callWhenRunning(keepGoing, 0)
     reactor.run()
     
