@@ -273,6 +273,8 @@ class Tileset:
         Compares newMap to latest fullMap. Returns newMap with '-2' in positions that didn't change.
         """
         
+        return newMap
+        
         if len(newMap) != len(self.fullMap):
             #Map may have changed dimensions
             return newMap
