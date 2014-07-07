@@ -20,6 +20,7 @@ class Tileset:
         self.screen_y = 0
         
         self.fullMap = []
+        self.prevDifMap = []
         
         if filename is None:
             #fake a filename
@@ -215,7 +216,7 @@ class Tileset:
         
     def _tileMapDifference(self, newMap):
         """
-        Compares newMap to latest fullMap. Returns newMap with '-2' in positions that didn't change.
+        Compares newMap to latest fullMap and prevDifMap. Returns newMap with '-2' in positions that didn't change.
         """
         
         #return newMap
@@ -228,14 +229,16 @@ class Tileset:
                 for i in xrange(len(newMap)):
                     rowDif = []
                     for j in xrange(len(newMap[0])):
-                        if newMap[i][j] == self.fullMap[i][j]:
+                        if newMap[i][j] == self.fullMap[i][j] and self.prevDifMap == -2:
                             rowDif.append(-2)
-                            #differenceMap.append(-2)
                         else:
                             rowDif.append(newMap[i][j])
                             #differenceMap.append(newMap[i])
                     differenceMap.append(rowDif)
                 
+                #Update the saved difMap
+                self.prevDifMap[:] = []
+                self.prevDifMap.extend(differenceMap)
                 return differenceMap
         except:
             print("Difference map exception")
