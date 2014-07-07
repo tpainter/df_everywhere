@@ -20,6 +20,12 @@ if __name__ == "__main__":
     
     import wamp_local
     
+    #If 'localTest' file is present, use separate configuration
+    import os.path
+    localTest = os.path.isfile('localTest')
+    if localTest:
+        print("localTest file found. Proceeding appropriately.")
+    
     debug_all = False
     need_wamp_server = False
     
@@ -79,16 +85,25 @@ if __name__ == "__main__":
         
         if len(client.connection) > 0 and len(client.subscriptions) < 1:
             #add a subscription once
-            d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')
+            if localTest:
+                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.test.commands')
+            else:
+                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')
             client.subscriptions.append(d)
             
         if len(client.connection) > 0 and len(client.rpcs) < 1:
             #register a rpc once
-            d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.g1.tilesetimage')
+            if localTest:
+                d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.test.tilesetimage')
+            else:
+                d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.g1.tilesetimage')
             client.rpcs.append(d)
             
         if len(client.connection) > 0:
-            client.connection[0].publish("df_anywhere.g1.map",tileMap)
+            if localTest:
+                client.connection[0].publish("df_anywhere.test.map",tileMap)
+            else:
+                client.connection[0].publish("df_anywhere.g1.map",tileMap)
             if debug_all:
                 print("Published tilemap.")
         else:
@@ -98,15 +113,22 @@ if __name__ == "__main__":
         #Periodically publish the latest tileset filename
         if tick % 5 == 0:
             if len(client.connection) > 0:
-                client.connection[0].publish("df_anywhere.g1.tileset", tset.filename)
+                if localTest:
+                    client.connection[0].publish("df_anywhere.test.tileset", tset.filename)
+                else:
+                    client.connection[0].publish("df_anywhere.g1.tileset", tset.filename)
                 if debug_all:
                     print("Published tileset.")
         
         #Periodically publish the screen size and tile size
         if tick % 5 == 1:
             if len(client.connection) > 0:
-                client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
-                client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
+                if localTest:
+                    client.connection[0].publish("df_anywhere.test.screensize", [tset.screen_x, tset.screen_y])
+                    client.connection[0].publish("df_anywhere.test.tilesize", [tset.tile_x, tset.tile_y])
+                else:
+                    client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
+                    client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
                 if debug_all:
                     print("Published screensize.")
         
