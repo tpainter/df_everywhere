@@ -109,7 +109,7 @@ if __name__ == "__main__":
         
                     
         #Periodically publish the latest tileset filename
-        if tick % 5 == 0:
+        if tick % 50 == 0:
             if len(client.connection) > 0:
                 if localTest:
                     client.connection[0].publish("df_anywhere.test.tileset", tset.filename)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                     client.connection[0].publish("df_anywhere.g1.tileset", tset.filename)
         
         #Periodically publish the screen size and tile size
-        if tick % 5 == 1:
+        if tick % 50 == 1:
             if len(client.connection) > 0:
                 if localTest:
                     client.connection[0].publish("df_anywhere.test.screensize", [tset.screen_x, tset.screen_y])
