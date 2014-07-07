@@ -56,10 +56,15 @@ def screenshot(hwnd = None, debug = False):
     bmpinfo = saveBitMap.GetInfo()
     bmpstr = saveBitMap.GetBitmapBits(True)
     
-    img = Image.frombuffer(
-        'RGB',
-        (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
-        bmpstr, 'raw', 'BGRX', 0, 1)
+    #If the window is minimized, no useful image data is received. Check this
+    try:
+        img = Image.frombuffer(
+            'RGB',
+            (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
+            bmpstr, 'raw', 'BGRX', 0, 1)
+    except:
+        print("Dwarf Fortress window must not be minimized.")
+        result = 0
     
     win32gui.DeleteObject(saveBitMap.GetHandle())
     saveDC.DeleteDC()

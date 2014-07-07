@@ -79,6 +79,9 @@ if __name__ == "__main__":
                 tileMap = tset.parseImage(shot, returnFullMap = True)
             else:
                 tileMap = tset.parseImage(shot, returnFullMap = False)
+        else:
+            #If there was an error getting the tilemap, fake one.
+            tileMap = []
                 
         if len(client.connection) > 0 and len(client.subscriptions) < 1:
             #add a subscription once
