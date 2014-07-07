@@ -113,7 +113,7 @@ if __name__ == "__main__":
         
                     
         #Periodically publish the latest tileset filename
-        if tick % 50 == 0:
+        if tick % 25 == 0:
             if len(client.connection) > 0:
                 if localTest:
                     client.connection[0].publish("df_anywhere.test.tileset", tset.filename)
