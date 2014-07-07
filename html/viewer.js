@@ -58,7 +58,7 @@ $(document).ready( function(){
 
 function draw_image(tile_map){
     if (tileset.loaded){
-        console.log("Drawing map.");
+        //console.log("Drawing map.");
         var row = 0;
         var column = 0;
         tile_map = tile_map[0];
@@ -77,7 +77,7 @@ function draw_image(tile_map){
 
 function update_tileset(fname){
     if (tileset.tileImageName === fname[0]){
-        console.log("Tileset name update not needed.");
+        //console.log("Tileset name update not needed.");
     }
     else {
         console.log("Updating tileset name:" + fname[0]);
@@ -108,7 +108,7 @@ function update_tilesize(dims){
         tileset = new Tileset(tile_x, tile_y); 
     }
     else {
-        console.log("Tile size update not needed.");
+        //console.log("Tile size update not needed.");
     }
 }
 
@@ -123,7 +123,7 @@ function update_screensize(dims) {
         ctx.canvas.height = screen_y;
     }
     else {
-        console.log("Screen size update not needed.");
+        //console.log("Screen size update not needed.");
     }    
 }
 
