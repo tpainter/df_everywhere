@@ -140,9 +140,9 @@ class SendInput:
         """
         Sanitizes command then sends it to window.
         """
-        print("received: %s" % dirtyCommand)
+        #print("received: %s" % dirtyCommand)
         cleanCommand = self._sanitizeCommand(dirtyCommand)
-        print("cleaned: %s" % cleanCommand)
+        #print("cleaned: %s" % cleanCommand)
         if cleanCommand is not None:
             self._sendCommand(cleanCommand)
         
