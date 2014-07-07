@@ -20,6 +20,10 @@ if __name__ == "__main__":
     
     import wamp_local
     
+    #Uncomment the two lines below to get more detailed errors
+    #from twisted.internet.defer import setDebugging
+    #setDebugging(True)
+    
     #If 'localTest' file is present, use separate configuration
     import os.path
     localTest = os.path.isfile('localTest')
@@ -69,7 +73,7 @@ if __name__ == "__main__":
     tickMax = 80
     
     @inlineCallbacks
-    def keepGoing(tick, timeLastTick):
+    def keepGoing(tick):
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
 
@@ -127,20 +131,12 @@ if __name__ == "__main__":
                     client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
         
         if (tick < tickMax or runContinuously):
-            timeNow = time.clock()
-            if timeLastTick - timeNow > 0.2:
-                #Took too long. Immediately call next tick
-                #print("Tick...")
-                reactor.callLater(0, keepGoing, tick + 1, timeNow)
-            else:
-                #Call next tick at proper time
-                tickPause = max(0.2 - (timeNow - timeLastTick), 0.001)
-                #print("Tick...")
-                reactor.callLater(tickPause, keepGoing, tick + 1)
+            reactor.callLater(0.1, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")
             reactor.stop()
-    tNow = time.clock()    
-    reactor.callWhenRunning(keepGoing, 0, tNow)
+            
+    
+    reactor.callLater(0, keepGoing, 0)
     reactor.run()
     
