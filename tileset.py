@@ -72,11 +72,6 @@ class Tileset:
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
         
-        if self.debug:
-            print("Tileset image dimensions: %dx%d" % (image_x, image_y))
-            print("Tileset tiles: %dx%d" % (tiles_x, tiles_y))
-            tileDictStats = {}
-        
         #tile number i.e. "position"
         t = 0
         
@@ -98,37 +93,14 @@ class Tileset:
                     #It would be bad to find a duplicate in the tileset.
                     print("Error: Found duplicate tile in tileset. Exiting.")
                     print("t=%d" % t)
-                    if self.debug:
-                        tileDictStats[tile_hash] += 1
                     exit()
                 else:
                     self.tileDict[tile_hash] = t
-                    if self.debug:
-                        tileDictStats[tile_hash] = 1
-                        #filename = "aa_image%d.png" % t                        
-                        #tile.save(filename)
                         
                 t += 1
                         
         self.tileset = img
         print("Tileset loaded: %s with %d tiles" % (self.filename, t))
-        
-        if self.debug:            
-            duplicates = 0
-            nones = 0
-            ones = 0
-            others = 0
-            for i in tileDictStats.keys():
-                if tileDictStats[i] > 1:
-                    duplicates += 1
-                elif tileDictStats[i] == 0:
-                    nones += 1
-                elif tileDictStats[i] == 1:
-                    ones += 1
-                else:
-                    others += 1    
-        
-            print("Tileset Load: duplicates: %d ones: %d nones: %d others: %d" % (duplicates, ones, nones, others))
             
     def _addTileToSet(self, img):
         """
@@ -211,11 +183,6 @@ class Tileset:
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
         
-        if self.debug:
-            print image_x, image_y
-            print tiles_x, tiles_y
-            tileDictStats = {}        
-        
         for y_start in range(tiles_y):
             row  = []
             for x_start in range(tiles_x):
@@ -226,35 +193,13 @@ class Tileset:
                 
                 if tile_hash in self.tileDict:
                     row.append(self.tileDict[tile_hash])
-                    if self.debug:
-                        if tile_hash in tileDictStats:
-                            tileDictStats[tile_hash] += 1
-                        else:
-                            tileDictStats[tile_hash] = 1
                 else:
                     row.append(-1)
                     self._addTileToSet(tile)
                     tileSetChanged = True
                         
             tileMap.append(row)
-        
-        if self.debug:            
-            duplicates = 0
-            nones = 0
-            ones = 0
-            others = 0
-            for i in tileDictStats.keys():
-                if tileDictStats[i] > 1:
-                    duplicates += 1
-                elif tileDictStats[i] == 0:
-                    nones += 1
-                elif tileDictStats[i] == 1:
-                    ones += 1
-                else:
-                    others += 1    
-        
-            print("Parse: duplicates: %d ones: %d nones: %d others: %d" % (duplicates, ones, nones, others))
-        
+                
         if tileSetChanged:
             #If new tiles were added, save the file to disk.
             #Do this here so that each new tile isn't saved.

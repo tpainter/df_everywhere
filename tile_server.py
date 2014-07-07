@@ -79,10 +79,7 @@ if __name__ == "__main__":
                 tileMap = tset.parseImage(shot, returnFullMap = True)
             else:
                 tileMap = tset.parseImage(shot, returnFullMap = False)
-            
-        if debug_all:
-            print("tileMap created.")
-        
+                
         if len(client.connection) > 0 and len(client.subscriptions) < 1:
             #add a subscription once
             if localTest:
@@ -104,8 +101,6 @@ if __name__ == "__main__":
                 client.connection[0].publish("df_anywhere.test.map",tileMap)
             else:
                 client.connection[0].publish("df_anywhere.g1.map",tileMap)
-            if debug_all:
-                print("Published tilemap.")
         else:
             print("Waiting for WAMP connection.")
         
@@ -117,8 +112,6 @@ if __name__ == "__main__":
                     client.connection[0].publish("df_anywhere.test.tileset", tset.filename)
                 else:
                     client.connection[0].publish("df_anywhere.g1.tileset", tset.filename)
-                if debug_all:
-                    print("Published tileset.")
         
         #Periodically publish the screen size and tile size
         if tick % 5 == 1:
@@ -129,8 +122,6 @@ if __name__ == "__main__":
                 else:
                     client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
                     client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
-                if debug_all:
-                    print("Published screensize.")
         
         if (tick < tickMax or runContinuously):
             timeNow = time.clock()
