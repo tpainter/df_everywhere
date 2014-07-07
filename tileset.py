@@ -219,24 +219,27 @@ class Tileset:
         """
         
         #return newMap
-        
-        if len(newMap) != len(self.fullMap):
-            #Map may have changed dimensions
+        try:
+            if len(newMap) != len(self.fullMap):
+                #Map may have changed dimensions
+                return newMap
+            else:
+                differenceMap = []
+                for i in xrange(len(newMap)):
+                    rowDif = []
+                    for j in xrange(len(newMap[0])):
+                        if newMap[i][j] == self.fullMap[i][j]:
+                            rowDif.append(-2)
+                            #differenceMap.append(-2)
+                        else:
+                            rowDif.append(newMap[i][j])
+                            #differenceMap.append(newMap[i])
+                    differenceMap.append(rowDif)
+                
+                return differenceMap
+        except:
+            print("Difference map exception")
             return newMap
-        else:
-            differenceMap = []
-            for i in xrange(len(newMap)):
-                rowDif = []
-                for j in xrange(len(newMap[0])):
-                    if newMap[i][j] == self.fullMap[i][j]:
-                        rowDif.append(-2)
-                        #differenceMap.append(-2)
-                    else:
-                        rowDif.append(newMap[i][j])
-                        #differenceMap.append(newMap[i])
-                differenceMap.append(rowDif)
-            
-            return differenceMap
         
     def _imageHash(self, img):
         """
