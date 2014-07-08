@@ -197,3 +197,4 @@ def trim(im, debug = False):
         print(bbox)
     if bbox:
         return im.crop(bbox)
+        

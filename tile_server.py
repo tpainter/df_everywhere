@@ -6,7 +6,6 @@ if __name__ == "__main__":
     When run directly, it finds Dwarf Fortress window
     """  
     from sys import platform as _platform
-    import time
     from twisted.internet import reactor
     import utils
     import tileset
@@ -74,6 +73,18 @@ if __name__ == "__main__":
     
     @inlineCallbacks
     def keepGoing(tick):
+        if client.heartbeatCounter < 1 or client.heartbeatPause:
+            #No clients have connected recently, suspend processing
+            if not client.heartbeatPause:
+                #heartbeatPause needs to be set.
+                client.heartbeatPause = True
+                print("No hearbeats recieved, suspending...")
+            
+            reactor.callLater(0.1, keepGoing, tick + 1)
+            return
+        
+        
+        
         shot = utils.screenshot(window_handle[0], debug = False)
         shot = utils.trim(shot, debug = False)
 
@@ -91,9 +102,12 @@ if __name__ == "__main__":
             #add a subscription once
             if localTest:
                 d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.test.commands')
+                d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, 'df_everywhere.test.heartbeats')
             else:
-                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')
+                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')                
+                d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, 'df_everywhere.g1.heartbeats')
             client.subscriptions.append(d)
+            print("WAMP connected...")
             
         if len(client.connection) > 0 and len(client.rpcs) < 1:
             #register a rpc once
@@ -105,32 +119,34 @@ if __name__ == "__main__":
             
         if len(client.connection) > 0:
             if localTest:
-                client.connection[0].publish("df_anywhere.test.map",tileMap)
+                client.connection[0].publish("df_everywhere.test.map",tileMap)
             else:
-                client.connection[0].publish("df_anywhere.g1.map",tileMap)
+                client.connection[0].publish("df_everywhere.g1.map",tileMap)
         else:
             print("Waiting for WAMP connection.")
         
                     
         #Periodically publish the latest tileset filename
-        if tick % 25 == 0:
+        if tick % 20 == 0:
             if len(client.connection) > 0:
                 if localTest:
-                    client.connection[0].publish("df_anywhere.test.tileset", tset.filename)
+                    client.connection[0].publish("df_everywhere.test.tileset", tset.filename)
                 else:
-                    client.connection[0].publish("df_anywhere.g1.tileset", tset.filename)
+                    client.connection[0].publish("df_everywhere.g1.tileset", tset.filename)
         
         #Periodically publish the screen size and tile size
         if tick % 50 == 1:
             if len(client.connection) > 0:
                 if localTest:
-                    client.connection[0].publish("df_anywhere.test.screensize", [tset.screen_x, tset.screen_y])
-                    client.connection[0].publish("df_anywhere.test.tilesize", [tset.tile_x, tset.tile_y])
+                    client.connection[0].publish("df_everywhere.test.screensize", [tset.screen_x, tset.screen_y])
+                    client.connection[0].publish("df_everywhere.test.tilesize", [tset.tile_x, tset.tile_y])
                 else:
-                    client.connection[0].publish("df_anywhere.g1.screensize", [tset.screen_x, tset.screen_y])
-                    client.connection[0].publish("df_anywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
+                    client.connection[0].publish("df_everywhere.g1.screensize", [tset.screen_x, tset.screen_y])
+                    client.connection[0].publish("df_everywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
         
         if (tick < tickMax or runContinuously):
+            if client.heartbeatCounter > 0:
+                client.heartbeatCounter -= 1
             reactor.callLater(0.1, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")

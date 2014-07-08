@@ -82,7 +82,6 @@ function update_tileset(fname){
     else {
         console.log("Updating tileset name:" + fname[0]);
         tileset.tileImageName = fname[0];
-        //tileset_image.src = "./tilesets/" + fname[0];
         //Request tileset image via websockets
         wamp_session.call('df_everywhere.g1.tilesetimage').then(
             function (str) {
@@ -135,8 +134,6 @@ try {
 }
 
 var connection = new autobahn.Connection({
-   //url: 'ws://127.0.0.1:7081/ws',
-   //url: 'ws://192.168.0.20:7081/ws',
    url: 'ws://dfeverywhere.com:7081/ws',
    realm: 'realm1'}
 );
@@ -149,16 +146,20 @@ connection.onopen = function (session) {
     wamp_session = session;
 
    //subscribe to tilemap
-   session.subscribe("df_anywhere.g1.map", draw_image);
+   session.subscribe("df_everywhere.g1.map", draw_image);
    
    //subscribe to tileset updates
-   session.subscribe("df_anywhere.g1.tileset", update_tileset);
+   session.subscribe("df_everywhere.g1.tileset", update_tileset);
    
    //subscribe to tile size updates
-   session.subscribe("df_anywhere.g1.tilesize", update_tilesize);
+   session.subscribe("df_everywhere.g1.tilesize", update_tilesize);
    
    //subscribe to screensize updates
-   session.subscribe("df_anywhere.g1.screensize", update_screensize);
+   session.subscribe("df_everywhere.g1.screensize", update_screensize);
+   
+   //send heartbeats every 30 seconds
+   session.publish("df_everywhere.g1.heartbeats", ['beat']);
+   setInterval(function(){session.publish("df_everywhere.g1.heartbeats", ['beat']);}, 30 * 1000);
 };
 
 connection.open();
