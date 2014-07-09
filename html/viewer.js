@@ -101,9 +101,9 @@ function update_tilesize(dims){
     tile_x = dims[0][0];
     tile_y = dims[0][1];
     
-    if (tile_x != tileset.tile_x || tile_y != tilese.tile_y){
+    if (tile_x != tileset.tile_x || tile_y != tileset.tile_y){
         //Update tileset with new tile size
-        console.log("Tile size updating.")
+        console.log("Tile size updating.");
         tileset = new Tileset(tile_x, tile_y); 
     }
     else {
@@ -117,7 +117,8 @@ function update_screensize(dims) {
     screen_y = dims[0][1];
     
     if (screen_x != ctx.canvas.width || screen_y != ctx.canvas.height){
-        console.log("Updating screen size.")
+        console.log("Updating screen size.");
+        console.log("x:" + screen_x + " y:" + screen_y);
         ctx.canvas.width = screen_x;
         ctx.canvas.height = screen_y;
     }
