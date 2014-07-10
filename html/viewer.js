@@ -1,7 +1,8 @@
 //Set up variable to use to publish events from other functions
 var wamp_session = false;
-
 var ctx;
+
+
 
 function Tileset(tile_x, tile_y){
     
@@ -53,11 +54,36 @@ $(document).ready( function(){
         
     ctx = $('#gameboard')[0].getContext("2d");
     ctx.canvas.width = 80 * 16;
-    ctx.canvas.height = 25 * 16;    
+    ctx.canvas.height = 25 * 16;
+
 });
+
+//Set up loading spinner
+var spinOpts = {
+    lines: 11, // The number of lines to draw
+    length: 15, // The length of each line
+    width: 11, // The line thickness
+    radius: 30, // The radius of the inner circle
+    corners: 1, // Corner roundness (0..1)
+    rotate: 0, // The rotation offset
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    color: '#0f0f0f', // #rgb or #rrggbb or array of colors
+    speed: 0.6, // Rounds per second
+    trail: 30, // Afterglow percentage
+    shadow: false, // Whether to render a shadow
+    hwaccel: true, // Whether to use hardware acceleration
+    className: 'spinner', // The CSS class to assign to the spinner
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    top: '20%', // Top position relative to parent
+    left: '10%' // Left position relative to parent
+};
+var spinTarget = document.getElementById('DfDisplay');
+var spinner = new Spinner(spinOpts).spin(spinTarget);
 
 function draw_image(tile_map){
     if (tileset.loaded){
+        //stop spinner
+        spinner.stop();
         //console.log("Drawing map.");
         var row = 0;
         var column = 0;
