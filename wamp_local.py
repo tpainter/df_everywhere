@@ -49,7 +49,7 @@ class WampHolder:
         """
         Tracks heartbeats from clients. Ignore 'recv'.
         """
-        print("heartbeat received."
+        print("heartbeat received.")
         #On hearbeat, reset counter.
         self.heartbeatCounter = 500
         if self.heartbeatPause:
