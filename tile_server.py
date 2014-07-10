@@ -73,6 +73,10 @@ if __name__ == "__main__":
     
     @inlineCallbacks
     def keepGoing(tick):
+        if client.heartbeatCounter > 0:
+                client.heartbeatCounter -= 1
+        if client.heartbeatCounter % 100 == 1:
+            print("Heartbeat counter is: %d" % client.heartbeatCounter)
         if client.heartbeatCounter < 1 or client.heartbeatPause:
             #No clients have connected recently, suspend processing
             if not client.heartbeatPause:
@@ -145,8 +149,6 @@ if __name__ == "__main__":
                     client.connection[0].publish("df_everywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
         
         if (tick < tickMax or runContinuously):
-            if client.heartbeatCounter > 0:
-                client.heartbeatCounter -= 1
             reactor.callLater(0.1, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")
