@@ -167,7 +167,7 @@ class Tileset:
         """
         
         print("Saving new tileset image: %s" % self.filename)
-        self.tileset.save("./html/tilesets/%s" % self.filename)
+        self.tileset.save("./html/tilesets/%s" % self.filename, optimize = True )
         
     def parseImage(self, img, returnFullMap = True):
         """
@@ -258,7 +258,7 @@ class Tileset:
         Converts tileset image to byte string so that it can be send via WAMP.
         """
         img_io = StringIO()
-        self.tileset.save(img_io, 'png')
+        self.tileset.save(img_io, 'png', optimize = True)
         img_io.seek(0)
         #return img_io
         #can't send binary data directly. Base64 encode first.
