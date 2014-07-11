@@ -75,16 +75,25 @@ if __name__ == "__main__":
     def keepGoing(tick):
         
         shot = utils.screenshot(window_handle[0], debug = False)
-        shot = utils.trim(shot, debug = False)
+        trimmedShot = utils.trim(shot, debug = False)
+        
+        shot_x, shot_y = shot.size
+        trimmedShot_x, trimmedShot_y = trimmedShot.size
+        
+        if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
+            print("Error with screen dimensions.")
+            shot.save('screenerror%d.png' % tick)
+            trimmedShot.save('screenerror%da.png' % tick)
 
-        if shot is not None:
+        if trimmedShot is not None:
             #Only send a full tile map every 5 ticks, otherwise just send changes
             if (tick + 1) % 20 == 0:
-                tileMap = tset.parseImage(shot, returnFullMap = True)
+                tileMap = tset.parseImage(trimmedShot, returnFullMap = True)
             else:
-                tileMap = tset.parseImage(shot, returnFullMap = False)
+                tileMap = tset.parseImage(trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
+            print("Faking tileMap.")
             tileMap = []
                 
         if len(client.connection) > 0 and len(client.subscriptions) < 1:
@@ -116,7 +125,7 @@ if __name__ == "__main__":
         
                     
         #Periodically publish the latest tileset filename
-        if tick % 20 == 0:
+        if tick % 10 == 0:
             if len(client.connection) > 0:
                 if localTest:
                     client.connection[0].publish("df_everywhere.test.tileset", tset.filename)
