@@ -43,7 +43,6 @@ class WampHolder:
         self.subscriptions = []
         self.rpcs = []
         self.heartbeatCounter = 100
-        self.heartbeatPause = False
         
     def receiveHeartbeats(self, recv):
         """
@@ -52,9 +51,7 @@ class WampHolder:
         print("heartbeat received.")
         #On hearbeat, reset counter.
         self.heartbeatCounter = 500
-        if self.heartbeatPause:
-            self.heartbeatPause = False
-            print("Heartbeat received. Resuming.")
+        print("Heartbeat received. Resuming.")
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """
