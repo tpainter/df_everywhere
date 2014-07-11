@@ -153,7 +153,7 @@ if __name__ == "__main__":
             print("No hearbeats recieved, slowing...")            
             reactor.callLater(0.5, keepGoing, tick + 1)
         elif (tick < tickMax or runContinuously):
-            reactor.callLater(0.1, keepGoing, tick + 1)
+            reactor.callLater(0.15, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")
             reactor.stop()
