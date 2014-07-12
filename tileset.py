@@ -251,7 +251,9 @@ class Tileset:
         
         #Use md5 since this isn't a secure application and speed is helpful.
         #md5 is 32 characters, img.tostring() for 12x12 is 432 characters
-        return hashlib.md5(img.tostring()).hexdigest()
+        #return hashlib.md5(img.tostring()).hexdigest()
+        #Try to speed up hashing by using string hash
+        return str.__hash__(img.tostring())
         
     def wampSend(self):
         """
