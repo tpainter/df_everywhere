@@ -145,15 +145,15 @@ if __name__ == "__main__":
         #Deal with heartbeats
         if client.heartbeatCounter > 0:
                 client.heartbeatCounter -= 1
-        if client.heartbeatCounter % 100 == 1:
-            print("Heartbeat counter is: %d" % client.heartbeatCounter)
             
         if client.heartbeatCounter < 1:
             #No clients have connected recently, slow processing
-            print("No hearbeats recieved, slowing...")            
+            if not client.slowed:
+                print("No hearbeats received, slowing...")
+                client.slowed = True
             reactor.callLater(0.5, keepGoing, tick + 1)
         elif (tick < tickMax or runContinuously):
-            reactor.callLater(0.15, keepGoing, tick + 1)
+            reactor.callLater(0.1, keepGoing, tick + 1)
         else:
             print("Tick limit reached. Exiting...")
             reactor.stop()
