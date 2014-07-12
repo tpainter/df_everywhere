@@ -81,9 +81,10 @@ if __name__ == "__main__":
         trimmedShot_x, trimmedShot_y = trimmedShot.size
         
         if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
-            print("Error with screen dimensions.")
+            #print("Error with screen dimensions.")
             #shot.save('screenerror%d.png' % tick)
             #trimmedShot.save('screenerror%da.png' % tick)
+            pass
 
         if trimmedShot is not None:
             #Only send a full tile map every 5 ticks, otherwise just send changes
@@ -136,11 +137,15 @@ if __name__ == "__main__":
         if tick % 50 == 1:
             if len(client.connection) > 0:
                 if localTest:
-                    client.connection[0].publish("df_everywhere.test.screensize", [tset.screen_x, tset.screen_y])
                     client.connection[0].publish("df_everywhere.test.tilesize", [tset.tile_x, tset.tile_y])
+                    #Only send screen size update if it makes sense
+                    if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
+                        client.connection[0].publish("df_everywhere.test.screensize", [tset.screen_x, tset.screen_y])
                 else:
-                    client.connection[0].publish("df_everywhere.g1.screensize", [tset.screen_x, tset.screen_y])
                     client.connection[0].publish("df_everywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
+                    #Only send screen size update if it makes sense
+                    if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
+                        client.connection[0].publish("df_everywhere.g1.screensize", [tset.screen_x, tset.screen_y])
         
         #Deal with heartbeats
         if client.heartbeatCounter > 0:
