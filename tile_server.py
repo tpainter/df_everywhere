@@ -80,13 +80,13 @@ if __name__ == "__main__":
         shot_x, shot_y = shot.size
         trimmedShot_x, trimmedShot_y = trimmedShot.size
         
-        if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
-            #print("Error with screen dimensions.")
-            #shot.save('screenerror%d.png' % tick)
-            #trimmedShot.save('screenerror%da.png' % tick)
-            pass
-
         if trimmedShot is not None:
+            if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
+                #print("Error with screen dimensions.")
+                #shot.save('screenerror%d.png' % tick)
+                #trimmedShot.save('screenerror%da.png' % tick)
+                pass
+                
             #Only send a full tile map every 5 ticks, otherwise just send changes
             if (tick + 1) % 20 == 0:
                 tileMap = tset.parseImage(trimmedShot, returnFullMap = True)
