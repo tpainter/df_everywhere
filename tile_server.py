@@ -7,6 +7,8 @@ if __name__ == "__main__":
     """  
     from sys import platform as _platform
     from twisted.internet import reactor
+    import ConfigParser
+    
     import utils
     import tileset
     import sendInput
@@ -29,9 +31,23 @@ if __name__ == "__main__":
     if localTest:
         print("localTest file found. Proceeding appropriately.")
     
-    debug_all = False
-    need_wamp_server = False
+    Config = ConfigParser.ConfigParser()
+    try:
+        Config.read(".\dfeverywhere.conf")
+        web_username = Config.get('dfeverywhere', 'USERNAME')
+        web_key = Config.get('dfeverywhere', 'KEY')
+        need_wamp_server = False
+    except:
+        #If file is missing, start local server
+        web_username = ''
+        web_key = ''
+        need_wamp_server = True
     
+    if (web_username == '') and (web_key == ''):
+        #No credentials entered, use local server
+        need_wamp_server = True
+       
+        
     if need_wamp_server:
         #Start WAMP server
         wamp_local.wampServ("ws://localhost:7081/ws", "tcp:7081", False)
