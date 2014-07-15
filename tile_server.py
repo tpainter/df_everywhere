@@ -91,12 +91,12 @@ if __name__ == "__main__":
     def keepGoing(tick):
         
         shot = utils.screenshot(window_handle[0], debug = False)
-        trimmedShot = utils.trim(shot, debug = False)
-        
         shot_x, shot_y = shot.size
-        trimmedShot_x, trimmedShot_y = trimmedShot.size
+        
+        trimmedShot = utils.trim(shot, debug = False)       
         
         if trimmedShot is not None:
+            trimmedShot_x, trimmedShot_y = trimmedShot.size
             if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
                 #print("Error with screen dimensions.")
                 #shot.save('screenerror%d.png' % tick)
