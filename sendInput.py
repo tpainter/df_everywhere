@@ -132,7 +132,6 @@ class SendInput:
         #Windows only.
         
         result = win32gui.SetForegroundWindow(self.hwnd)
-        #win32gui.SetFocus(self.hwnd)
         SendKeys.SendKeys(com)
         
         

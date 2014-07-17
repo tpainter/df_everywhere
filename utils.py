@@ -8,7 +8,6 @@ except:
     from PIL import ImageChops
 
 import win32gui
-import win32gui
 import win32ui
 from ctypes import windll
 import os

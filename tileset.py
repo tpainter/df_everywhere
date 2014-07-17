@@ -4,8 +4,7 @@ try:
 except:
     from PIL import Image
 
-from cStringIO import StringIO    
-import hashlib
+from cStringIO import StringIO
 
 class Tileset:
     """
@@ -178,9 +177,7 @@ class Tileset:
         image_x, image_y = img.size
         self.screen_x = image_x
         self.screen_y = image_y
-        
-        x = 0
-        y = 0    
+           
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
         

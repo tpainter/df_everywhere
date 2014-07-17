@@ -8,9 +8,6 @@ from autobahn.twisted.wamp import ApplicationSessionFactory
 from autobahn.twisted.websocket import WampWebSocketServerFactory
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.twisted.websocket import WampWebSocketClientFactory
-
-
-from autobahn.twisted.wamp import ApplicationSession
       
 class SubpubTileset(ApplicationSession):
     """
