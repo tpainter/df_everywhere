@@ -3,7 +3,7 @@
 #
 #
 import win32gui
-import SendKeys
+import third_party.SendKeys
 
 class SendInput:
     """

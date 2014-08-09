@@ -27,7 +27,7 @@ class Tileset:
             img = None
         else:
             self.filename = filename
-            img = Image.open("./html/tilesets/%s" % filename)
+            img = Image.open("./tilesets/%s" % filename)
             
         self.debug = debug        
         self.tileset = img        
@@ -166,7 +166,7 @@ class Tileset:
         """
         
         print("Saving new tileset image: %s" % self.filename)
-        self.tileset.save("./html/tilesets/%s" % self.filename, optimize = True )
+        self.tileset.save("./tilesets/%s" % self.filename, optimize = True )
         
     def parseImage(self, img, returnFullMap = True):
         """

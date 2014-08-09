@@ -134,7 +134,7 @@ def findLocalImg(x, y):
     fileList = []
     filePrefix = "%02dx%02d-" % (x, y)
     
-    for file in os.listdir("./html/tilesets/"):
+    for file in os.listdir("./tilesets/"):
         if file.endswith(".png"):
             if file.startswith(filePrefix):
                 fileList.append((int(file[6:11]), file))
