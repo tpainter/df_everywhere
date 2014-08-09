@@ -9,9 +9,7 @@ if __name__ == "__main__":
     from twisted.internet import reactor
     import ConfigParser
     
-    import utils
-    import tileset
-    import sendInput
+    from util import wamp_local, utils, tileset, sendInput
     
     from twisted.internet.defer import inlineCallbacks
     
@@ -19,7 +17,7 @@ if __name__ == "__main__":
     import sys
     log.startLogging(sys.stdout)        
     
-    import wamp_local
+    
     
     #Uncomment the two lines below to get more detailed errors
     #from twisted.internet.defer import setDebugging
