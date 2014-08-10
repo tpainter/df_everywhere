@@ -6,18 +6,15 @@ if __name__ == "__main__":
     When run directly, it finds Dwarf Fortress window
     """  
     from sys import platform as _platform
-    from twisted.internet import reactor
     import ConfigParser
+    from twisted.internet import reactor
+    from twisted.internet.defer import inlineCallbacks    
     
-    from util import wamp_local, utils, tileset, sendInput
-    
-    from twisted.internet.defer import inlineCallbacks
+    from util import wamp_local, utils, tileset, sendInput    
     
     from twisted.python import log
     import sys
-    log.startLogging(sys.stdout)        
-    
-    
+    log.startLogging(sys.stdout)    
     
     #Uncomment the two lines below to get more detailed errors
     #from twisted.internet.defer import setDebugging
@@ -31,10 +28,14 @@ if __name__ == "__main__":
     
     Config = ConfigParser.ConfigParser()
     try:
-        Config.read(".\dfeverywhere.conf")
+        if localTest:
+            Config.read(".\localTest")
+        else:
+            Config.read(".\dfeverywhere.conf")
         web_username = Config.get('dfeverywhere', 'USERNAME')
         web_key = Config.get('dfeverywhere', 'KEY')
         need_wamp_server = False
+        topicPrefix = "df_everywhere.%s" % web_username
     except:
         #If file is missing, start local server
         web_username = ''
@@ -42,15 +43,14 @@ if __name__ == "__main__":
         need_wamp_server = True
     
     if (web_username == '') and (web_key == ''):
-        #No credentials entered, use local server
-        need_wamp_server = True
-       
+        #No credentials entered, ask for credentials to be entered
+        print("No configuration details entered. Please add your credentials to 'dfeverywhere.conf'.")
+        exit()
         
     if need_wamp_server:
         #Start WAMP server
         wamp_local.wampServ("ws://localhost:7081/ws", "tcp:7081", False)
     
-        
     #Start WAMP client
     client = wamp_local.WampHolder()
     if need_wamp_server:
@@ -61,35 +61,40 @@ if __name__ == "__main__":
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
-        print("Linux unsuported at this time. Exiting...")
+        print("Linux unsupported at this time. Exiting...")
         exit()
     elif _platform == "darwin":
-        print("OS X unsuported at this time. Exiting...")
+        print("OS X unsupported at this time. Exiting...")
         exit()
     elif _platform == "win32":
         # Windows..
-        window_handle = utils.get_windows_bytitle("Dwarf Fortress")
-        shot = utils.screenshot(window_handle[0], debug = False)
+        window_handle = utils.get_windows_bytitle("Dwarf Fortress")            
+        try:
+            shot = utils.screenshot(window_handle[0], debug = False)
+        except:
+            print("Unable to find Dwarf Fortress window. Ensure that it is running.")
+            exit()
     else:
-        print("Unsuported platform detected. Exiting...")
+        print("Unsupported platform detected. Exiting...")
         exit()
     
-    shot = utils.trim(shot, debug = False)
-    #It is possible that shot can be "None". Need to handle this gracefully... Try it another way?
-    tile_x, tile_y = utils.findTileSize(shot)
+    
+    trimmedShot = utils.trim(shot, debug = False)
+    tile_x, tile_y = utils.findTileSize(trimmedShot)
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
     
     localCommands = sendInput.SendInput(window_handle[0])
-    
-    runContinuously = True
-    tickMax = 80
-    
+        
     @inlineCallbacks
     def keepGoing(tick):
-        
-        shot = utils.screenshot(window_handle[0], debug = False)
-        shot_x, shot_y = shot.size
+        try:
+            shot = utils.screenshot(window_handle[0], debug = False)
+            shot_x, shot_y = shot.size
+        except:
+            print("Error getting screen shot. Exiting.")
+            shot = None
+            reactor.stop()
         
         trimmedShot = utils.trim(shot, debug = False)       
         
@@ -113,28 +118,21 @@ if __name__ == "__main__":
                 
         if len(client.connection) > 0 and len(client.subscriptions) < 1:
             #add a subscription once
-            if localTest:
-                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.test.commands')
-                d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, 'df_everywhere.test.heartbeats')
-            else:
-                d = yield client.connection[0].subscribe(localCommands.receiveCommand, 'df_everywhere.g1.commands')                
-                d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, 'df_everywhere.g1.heartbeats')
+            d = yield client.connection[0].subscribe(localCommands.receiveCommand, '%s.commands' % topicPrefix)
+            d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, '%s.heartbeats' % topicPrefix)
+            
             client.subscriptions.append(d)
             print("WAMP connected...")
             
         if len(client.connection) > 0 and len(client.rpcs) < 1:
             #register a rpc once
-            if localTest:
-                d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.test.tilesetimage')
-            else:
-                d = yield client.connection[0].register(tset.wampSend, 'df_everywhere.g1.tilesetimage')
+            d = yield client.connection[0].register(tset.wampSend, '%s.tilesetimage' % topicPrefix)
+            
             client.rpcs.append(d)
             
         if len(client.connection) > 0:
-            if localTest:
-                client.connection[0].publish("df_everywhere.test.map",tileMap)
-            else:
-                client.connection[0].publish("df_everywhere.g1.map",tileMap)
+            client.connection[0].publish("%s.map" % topicPrefix,tileMap)
+            
         else:
             print("Waiting for WAMP connection.")
         
@@ -142,40 +140,27 @@ if __name__ == "__main__":
         #Periodically publish the latest tileset filename
         if tick % 10 == 0:
             if len(client.connection) > 0:
-                if localTest:
-                    client.connection[0].publish("df_everywhere.test.tileset", tset.filename)
-                else:
-                    client.connection[0].publish("df_everywhere.g1.tileset", tset.filename)
+                client.connection[0].publish("%s.tileset" % topicPrefix, tset.filename)
+                
         
         #Periodically publish the screen size and tile size
         if tick % 50 == 1:
             if len(client.connection) > 0:
-                if localTest:
-                    client.connection[0].publish("df_everywhere.test.tilesize", [tset.tile_x, tset.tile_y])
-                    #Only send screen size update if it makes sense
-                    if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
-                        client.connection[0].publish("df_everywhere.test.screensize", [tset.screen_x, tset.screen_y])
-                else:
-                    client.connection[0].publish("df_everywhere.g1.tilesize", [tset.tile_x, tset.tile_y])
-                    #Only send screen size update if it makes sense
-                    if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
-                        client.connection[0].publish("df_everywhere.g1.screensize", [tset.screen_x, tset.screen_y])
+                client.connection[0].publish("%s.tilesize" % topicPrefix, [tset.tile_x, tset.tile_y])
+                #Only send screen size update if it makes sense
+                if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
+                    client.connection[0].publish("%s.screensize" % topicPrefix, [tset.screen_x, tset.screen_y])
         
         #Deal with heartbeats
         if client.heartbeatCounter > 0:
                 client.heartbeatCounter -= 1
-            
-        if client.heartbeatCounter < 1:
+                reactor.callLater(0.1, keepGoing, tick + 1)            
+        else:
             #No clients have connected recently, slow processing
             if not client.slowed:
                 print("No hearbeats received, slowing...")
                 client.slowed = True
             reactor.callLater(0.5, keepGoing, tick + 1)
-        elif (tick < tickMax or runContinuously):
-            reactor.callLater(0.1, keepGoing, tick + 1)
-        else:
-            print("Tick limit reached. Exiting...")
-            reactor.stop()
             
     
     reactor.callLater(0, keepGoing, 0)
