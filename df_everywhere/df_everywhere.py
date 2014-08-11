@@ -27,9 +27,9 @@ if __name__ == "__main__":
     
     from util import wamp_local, utils, tileset, sendInput    
     
-    from twisted.python import log
-    import sys
-    log.startLogging(sys.stdout)    
+    #from twisted.python import log
+    #import sys
+    #log.startLogging(sys.stdout)    
     
     #Uncomment the two lines below to get more detailed errors
     #from twisted.internet.defer import setDebugging
@@ -47,17 +47,17 @@ if __name__ == "__main__":
             Config.read(".\localTest")
         else:
             Config.read(".\dfeverywhere.conf")
-        web_username = Config.get('dfeverywhere', 'USERNAME')
+        web_topic = Config.get('dfeverywhere', 'TOPIC')
         web_key = Config.get('dfeverywhere', 'KEY')
         need_wamp_server = False
-        topicPrefix = "df_everywhere.%s" % web_username
+        topicPrefix = "df_everywhere.%s" % web_topic
     except:
         #If file is missing, start local server
-        web_username = ''
+        web_topic = ''
         web_key = ''
         need_wamp_server = True
     
-    if (web_username == '') and (web_key == ''):
+    if (web_topic == '') and (web_key == ''):
         #No credentials entered, ask for credentials to be entered
         print("No configuration details entered. Please add your credentials to 'dfeverywhere.conf'.")
         exit()
