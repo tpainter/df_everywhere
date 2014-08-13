@@ -16,12 +16,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from twisted.internet import reactor
-from twisted.internet.endpoints import serverFromString
 from twisted.internet.endpoints import clientFromString
-from autobahn.wamp.router import RouterFactory
-from autobahn.twisted.wamp import RouterSessionFactory
 from autobahn.twisted.wamp import ApplicationSessionFactory
-from autobahn.twisted.websocket import WampWebSocketServerFactory
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.twisted.websocket import WampWebSocketClientFactory
       
@@ -73,6 +69,10 @@ def wampServ(wampAddress, wampPort, wampDebug = False):
     Sets up an Autobahn|Python WAMPv2 server.
     Code modified from WAMP documentation.
     """
+    from twisted.internet.endpoints import serverFromString
+    from autobahn.wamp.router import RouterFactory
+    from autobahn.twisted.wamp import RouterSessionFactory
+    from autobahn.twisted.websocket import WampWebSocketServerFactory
     
     ## create a WAMP router factory        
     router_factory = RouterFactory()
