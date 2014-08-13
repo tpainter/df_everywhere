@@ -16,4 +16,4 @@ setup(  name = "df_everywhere",
         version = "0.1",
         description = "df_everywhere",
         options = {"build_exe": build_exe_options},
-        executables = [Executable("tile_server.py", base=base)])
+        executables = [Executable("df_everywhere.py", base=base)])
