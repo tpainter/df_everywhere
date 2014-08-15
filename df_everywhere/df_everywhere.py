@@ -27,13 +27,16 @@ if __name__ == "__main__":
     
     from util import wamp_local, utils, tileset, sendInput    
     
-    #from twisted.python import log
-    #import sys
-    #log.startLogging(sys.stdout)    
-    
-    #Uncomment the two lines below to get more detailed errors
-    #from twisted.internet.defer import setDebugging
-    #setDebugging(True)
+    #Change this to True for enhanced debugging    
+    edebug = False
+    if edebug:
+        from twisted.python import log
+        import sys
+        log.startLogging(sys.stdout)    
+        
+        #Uncomment the two lines below to get more detailed errors
+        from twisted.internet.defer import setDebugging
+        setDebugging(True)
     
     #If 'localTest' file is present, use separate configuration
     import os.path
@@ -72,7 +75,7 @@ if __name__ == "__main__":
         #Connect to local server
         client.connection = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
     else:
-        client.connection = wamp_local.wampClient("ws://dfeverywhere.com:7081/ws", "tcp:dfeverywhere.com:7081")
+        client.connection = wamp_local.wampClient("ws://dfeverywhere.com:7081/ws", "tcp:dfeverywhere.com:7081", web_topic, web_key)
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":

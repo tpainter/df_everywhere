@@ -17,21 +17,35 @@
 
 from twisted.internet import reactor
 from twisted.internet.endpoints import clientFromString
+
 from autobahn.twisted.wamp import ApplicationSessionFactory
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.twisted.websocket import WampWebSocketClientFactory
+from autobahn.wamp import types
+from autobahn.wamp import auth
+
+
       
 class SubpubTileset(ApplicationSession):
     """
     An application component that subscribes and receives events.
     """
     
-    def __init__(self, realm = 'realm1'):
-        ApplicationSession.__init__(self)
-        self._realm = 'realm1'
-        
     def onConnect(self):
-        self.join(self._realm)
+        self.join(self.config.realm, [u"wampcra"], self.config.extra['topic'])
+    
+    def onChallenge(self, challenge):
+        #print challenge
+        if challenge.method == u"wampcra":
+            if u'salt' in challenge.extra:
+                key = auth.derive_key(self.config.extra['topic'], challenge.extra['salt'],
+                challenge.extra.get('iterations', None), challenge.extra.get('keylen', None))
+            else:
+                key = self.config.extra['topic']
+            signature = auth.compute_wcs(key, challenge.extra['challenge'])
+            return signature
+        else:
+            raise Exception("don't know how to compute challenge for authmethod {}".format(challenge.method))
     
     def onJoin(self, details):
         if not self in self.factory._myConnection:
@@ -88,15 +102,14 @@ def wampServ(wampAddress, wampPort, wampDebug = False):
     server = serverFromString(reactor, wampPort)
     server.listen(transport_factory)
     
-def wampClient(wampAddress, wampClientEndpoint):
+def wampClient(wampAddress, wampClientEndpoint, topic, key):
     """
     Sets up an Autobahn|python WAMPv2 client.
     Code modified from WAMP documentation.
     """
-        
-    session_factory = ApplicationSessionFactory()
     
-    ## .. and set the session class on the factory  
+    component_config = types.ComponentConfig(realm = "realm1", extra = {'key': unicode(key), 'topic': unicode(topic)})
+    session_factory = ApplicationSessionFactory(config = component_config)  
     session_factory._myConnection = []
     session_factory.session = SubpubTileset
     
