@@ -4,6 +4,7 @@ from cx_Freeze import setup, Executable
 # Dependencies are automatically detected, but it might need fine tuning.
 build_exe_options = {"packages": ["os", "zope.interface"], 
                     "excludes": ["tkinter"],
+                    "include_files": ['dfeverywhere.conf', 'tilesets\\'],
                     "includes": ["pkg_resources"],
                     "namespace_packages": ["zope"],
                     "silent": True}
