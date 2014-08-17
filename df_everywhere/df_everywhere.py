@@ -77,7 +77,7 @@ if __name__ == "__main__":
         #Connect to local server
         client.connection = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
     else:
-        client.connection = wamp_local.wampClient("ws://dfeverywhere.com:7081/ws", "tcp:dfeverywhere.com:7081", web_topic, web_key)
+        client.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1,dfeverywhere.com:7081", web_topic, web_key)
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
