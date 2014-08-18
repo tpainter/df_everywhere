@@ -14,7 +14,7 @@ build_exe_options = {"packages": ["os", "zope.interface"],
 base = None
 
 setup(  name = "df_everywhere",
-        version = "0.1.1",
+        version = "0.1.2",
         description = "df_everywhere",
         options = {"build_exe": build_exe_options},
         executables = [Executable("df_everywhere.py", base=base)])
