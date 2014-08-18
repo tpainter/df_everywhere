@@ -20,7 +20,7 @@
 #
 #
 import win32gui
-import third_party.SendKeys
+import SendKeys
 
 class SendInput:
     """
@@ -147,7 +147,7 @@ class SendInput:
     def _sendCommand(self, com):
         #This makes the window active and sends keyboard events directly.
         #Windows only.
-        
+        #print("Got: %s" % com)
         result = win32gui.SetForegroundWindow(self.hwnd)
         SendKeys.SendKeys(com)
         
