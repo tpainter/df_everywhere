@@ -19,7 +19,8 @@
 if __name__ == "__main__":
     """
     When run directly, it finds Dwarf Fortress window
-    """  
+    """
+    import sys
     from sys import platform as _platform
     import ConfigParser
     from twisted.internet import reactor
@@ -65,7 +66,8 @@ if __name__ == "__main__":
     if (web_topic == '') and (web_key == ''):
         #No credentials entered, ask for credentials to be entered
         print("No configuration details entered. Please add your credentials to 'dfeverywhere.conf'.")
-        exit()
+        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+        sys.exit()
         
     if need_wamp_server:
         #Start WAMP server
@@ -82,10 +84,12 @@ if __name__ == "__main__":
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
         print("Linux unsupported at this time. Exiting...")
-        exit()
+        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+        sys.exit()
     elif _platform == "darwin":
         print("OS X unsupported at this time. Exiting...")
-        exit()
+        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+        sys.exit()
     elif _platform == "win32":
         # Windows..
         window_handle = utils.get_windows_bytitle("Dwarf Fortress")            
@@ -93,10 +97,12 @@ if __name__ == "__main__":
             shot = utils.screenshot(window_handle[0], debug = False)
         except:
             print("Unable to find Dwarf Fortress window. Ensure that it is running.")
-            exit()
+            raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+            sys.exit()
     else:
         print("Unsupported platform detected. Exiting...")
-        exit()
+        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+        sys.exit()
     
     
     trimmedShot = utils.trim(shot, debug = False)
@@ -185,4 +191,5 @@ if __name__ == "__main__":
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
+    raw_input('DF Everywhere stopped. Press [enter] to close this window.')
     
