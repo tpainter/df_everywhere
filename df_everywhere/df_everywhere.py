@@ -39,6 +39,13 @@ if __name__ == "__main__":
         from twisted.internet.defer import setDebugging
         setDebugging(True)
     
+    #Use this for timing the number of cycles per second
+    timing = True
+    if timing:
+        global timedCalls
+        timedCalls = 0
+    
+    
     messages.welcome()
     
     #If 'localTest' file is present, use separate configuration
@@ -180,6 +187,11 @@ if __name__ == "__main__":
         #Deal with heartbeats
         if client.heartbeatCounter > 0:
                 client.heartbeatCounter -= 1
+                
+                if timing:
+                    global timedCalls
+                    timedCalls += 1
+                
                 reactor.callLater(0, keepGoing, tick + 1)            
         else:
             #No clients have connected recently, slow processing
@@ -187,7 +199,17 @@ if __name__ == "__main__":
                 print("No hearbeats received, slowing...")
                 client.slowed = True
             reactor.callLater(0.5, keepGoing, tick + 1)
+    
+    if timing:
+        def timeLoop():
+            global timedCalls
+            print('Calls per second: %d' % timedCalls)
             
+            timedCalls = 0
+            reactor.callLater(1, timeLoop)
+    
+    if timing:
+        reactor.callLater(1, timeLoop)
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
