@@ -180,7 +180,7 @@ if __name__ == "__main__":
         #Deal with heartbeats
         if client.heartbeatCounter > 0:
                 client.heartbeatCounter -= 1
-                reactor.callLater(0.1, keepGoing, tick + 1)            
+                reactor.callLater(0, keepGoing, tick + 1)            
         else:
             #No clients have connected recently, slow processing
             if not client.slowed:

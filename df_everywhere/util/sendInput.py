@@ -139,6 +139,7 @@ class SendInput:
                         'right': '{RIGHT}',
                         'down': '{DOWN}',
         }
+        
     
     def _sanitizeCommand(self, dirtyCommand):
         #return command from dictionary. If it doesn't exist, return 'None'
@@ -149,8 +150,7 @@ class SendInput:
         #Windows only.
         #print("Got: %s" % com)
         result = win32gui.SetForegroundWindow(self.hwnd)
-        SendKeys.SendKeys(com)
-        
+        SendKeys.SendKeys(com)        
         
     def receiveCommand(self, dirtyCommand):
         """
