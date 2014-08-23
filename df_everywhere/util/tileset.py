@@ -269,8 +269,11 @@ class Tileset:
         #Hash is faster
         #return hash(img.tostring())
         
-        #murmur3 is fastest
+        #murmur3 is fastest but not a lot faster than Hash
         return mmh3.hash(img.tostring())
+        
+        #just a long string?
+        #return img.tostring()
         
     def wampSend(self):
         """
