@@ -1,0 +1,17 @@
+  
+  13179989 function calls (13178164 primitive calls) in 233.556 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.041    0.041  233.575  233.575 df_everywhere.py:19(<module>)
+
+      173   18.494    0.107  168.010    0.971 tileset.py:187(parseImage)
+   545731   12.631    0.000  109.960    0.000 tileset.py:260(_imageHash)
+   545731   28.059    0.000   97.329    0.000 Image.py:522(tostring)
+   545905    9.936    0.000   33.112    0.000 Image.py:760(crop)
+  1091203   15.212    0.000   29.581    0.000 Image.py:1702(load)
+   545731   11.104    0.000   25.341    0.000 Image.py:387(_getencoder)
+   545905    8.818    0.000   14.549    0.000 Image.py:1685(__init__)
+      174    7.057    0.041   11.083    0.064 utils.py:46(screenshot)
+      
