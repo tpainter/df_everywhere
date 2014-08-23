@@ -21,6 +21,7 @@ except:
     from PIL import Image
 
 from cStringIO import StringIO
+import mmh3
 
 class Tileset:
     """
@@ -262,11 +263,14 @@ class Tileset:
         Returns a hash of the image.
         """
         
-        #Use md5 since this isn't a secure application and speed is helpful.
-        #md5 is 32 characters, img.tostring() for 12x12 is 432 characters
-        #return hashlib.md5(img.tostring()).hexdigest()
         #Try to speed up hashing by using string hash
-        return str.__hash__(img.tostring())
+        #return str.__hash__(img.tostring())
+        
+        #Hash is faster
+        #return hash(img.tostring())
+        
+        #murmur3 is fastest
+        return mmh3.hash(img.tostring())
         
     def wampSend(self):
         """
