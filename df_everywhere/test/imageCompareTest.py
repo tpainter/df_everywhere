@@ -36,7 +36,41 @@ from __main__ import a_img, b_img
 def equal(im1, im2):
     return ImageChops.difference(im1, im2).getbbox() is None 
 '''
-    
+
+setup3 = '''
+import numpy
+from __main__ import a_img, b_img
+def equal(im1, im2):
+    arr1 = numpy.array(im1)
+    arr2 = numpy.array(im2)
+    return (arr1 == arr2).all 
+'''
+
+setup4 = '''
+import Image
+from __main__ import a_img, b_img
+def equal(im1, im2):
+    pixels1 = im1.load()
+    pixels2 = im2.load()
+    img_x, img_y = im1.size
+    for x in range(img_x):
+        for y in range(img_y):
+            if pixels1[x,y] == pixels2[x,y]:
+                pass
+            else:
+                return False
+    return True 
+'''
+
+print("Different images...")
 print("Hash compare: \t\t%f" % min(timeit.Timer('equal(a_img, b_img)', setup).repeat(7, 1000)))
 print("mmh3 compare: \t\t%f" % min(timeit.Timer('equal(a_img, b_img)', setup1).repeat(7, 1000)))
-print("Direct compare: \t%f" % min(timeit.Timer('equal(a_img, b_img)', setup2).repeat(7, 1000)))
+print("Difference compare: \t%f" % min(timeit.Timer('equal(a_img, b_img)', setup2).repeat(7, 1000)))
+print("Numpy compare: \t\t%f" % min(timeit.Timer('equal(a_img, b_img)', setup3).repeat(7, 1000)))
+print("Pixel compare: \t\t%f" % min(timeit.Timer('equal(a_img, b_img)', setup4).repeat(7, 1000)))
+print("\nSame images...")
+print("Hash compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup).repeat(7, 1000)))
+print("mmh3 compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup1).repeat(7, 1000)))
+print("Difference compare: \t%f" % min(timeit.Timer('equal(a_img, a_img)', setup2).repeat(7, 1000)))
+print("Numpy compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup3).repeat(7, 1000)))
+print("Pixel compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup4).repeat(7, 1000)))
