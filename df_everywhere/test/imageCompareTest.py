@@ -10,10 +10,10 @@ import numpy
 import mmh3
 
 
-a = numpy.random.rand(16,16,3) * 255
+a = numpy.random.rand(32,32,3) * 255
 a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
 
-b = numpy.random.rand(16,16,3) * 255
+b = numpy.random.rand(32,32,3) * 255
 b_img = Image.fromarray(a.astype('uint8')).convert('RGB')
 
 

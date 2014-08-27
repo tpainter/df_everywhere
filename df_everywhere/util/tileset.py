@@ -17,11 +17,14 @@
 
 try:
     import Image
+    import ImageChops
 except:
     from PIL import Image
+    from PIL import ImageChops
 
 from cStringIO import StringIO
 import mmh3
+import numpy
 
 class Tileset:
     """
@@ -37,6 +40,8 @@ class Tileset:
         
         self.fullMap = []
         self.prevDifMap = []
+        self.prevImage = None
+        self.prevArray = None
         
         if filename is None:
             #fake a filename
@@ -219,7 +224,7 @@ class Tileset:
             #If new tiles were added, save the file to disk.
             #Do this here so that each new tile isn't saved.
             self._saveSet()
-            
+                    
         if returnFullMap:
             #Update fullMap
             self.fullMap[:] = []
@@ -257,6 +262,167 @@ class Tileset:
         except:
             print("Difference map exception")
             return newMap
+        
+    def parseImageFast(self, new_img, returnFullMap = True):
+        """
+        Compares two images pixel by pixel.
+        Doesn't end up being faster. 
+        """
+        tileMap = []
+        tileSetChanged = False
+        new_x, new_y = new_img.size
+        numTilesSame = 0
+        
+        if self.prevImage is None:
+            #Handle initial case
+            returnFullMap = True
+        else:
+            old_x, old_y = self.prevImage.size        
+        
+            #Make sure that image sizes match
+            if (old_x != new_x) or (old_y != new_y):
+                returnFullMap = True
+        
+        tiles_x = new_x / self.tile_x
+        tiles_y = new_y / self.tile_y
+        
+        for y_start in range(tiles_y):
+            row  = []
+            for x_start in range(tiles_x):
+                tile = new_img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
+                
+                if returnFullMap:
+                    #Use the hash of the tile as a key to ensure that it is unique
+                    tile_hash = self._imageHash(tile)
+                
+                    if tile_hash in self.tileDict:
+                        row.append(self.tileDict[tile_hash])
+                    else:
+                        row.append(-1)
+                        self._addTileToSet(tile)
+                        tileSetChanged = True
+                else:
+                    tile_prev = self.prevImage.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
+                    
+                    tilesSame = self._imgEqual(tile, tile_prev, False)
+                    
+                    if tilesSame:
+                        numTilesSame += 1
+                        row.append(-2)
+                    else:
+                        tile_hash = self._imageHash(tile)
+                        if tile_hash in self.tileDict:
+                            row.append(self.tileDict[tile_hash])
+                        else:
+                            row.append(-1)
+                            self._addTileToSet(tile)
+                            tileSetChanged = True
+            tileMap.append(row)
+        
+        if tileSetChanged:
+            #If new tiles were added, save the file to disk.
+            #Do this here so that each new tile isn't saved.
+            self._saveSet()
+        
+        #Update the stored image with the current one
+        self.prevImage = new_img
+        #print numTilesSame
+        
+        return tileMap
+
+    def parseImageArray(self, new_img, returnFullMap = True):
+        """
+        Compares two images.
+        """
+        tileMap = []
+        tileSetChanged = False
+        new_x, new_y = new_img.size
+        numSame = 0
+        
+        new_imgArray = numpy.array(new_img)
+        
+        if self.prevArray is None:
+            #Handle initial case
+            returnFullMap = True
+        else:
+            #print self.prevArray.shape
+            old_y, old_x, old_depth = self.prevArray.shape
+            prev_imgArray = self.prevArray            
+        
+            #Make sure that image sizes match
+            if (old_x != new_x) or (old_y != new_y):
+                returnFullMap = True
+        
+        tiles_x = new_x / self.tile_x
+        tiles_y = new_y / self.tile_y
+        
+        for y_start in range(tiles_y):
+            row  = []
+            for x_start in range(tiles_x):
+                tile_arr = new_imgArray[x_start * self.tile_x: y_start * self.tile_y, x_start * self.tile_x + self.tile_x: y_start * self.tile_y + self.tile_y]
+                tile_img = new_img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
+                
+                if returnFullMap:
+                    #Use the hash of the tile as a key to ensure that it is unique
+                    tile_hash = self._imageHash(tile_img)
+                
+                    if tile_hash in self.tileDict:
+                        row.append(self.tileDict[tile_hash])
+                    else:
+                        row.append(-1)
+                        self._addTileToSet(tile_img)
+                        tileSetChanged = True
+                else:
+                    #tile_prevImg = self.prevImage.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
+                    tile_prevArr = prev_imgArray[x_start * self.tile_x: y_start * self.tile_y, x_start * self.tile_x + self.tile_x: y_start * self.tile_y + self.tile_y]
+                    
+                    #tilesSame = (tile_prevArr == tile_arr).all()
+                    tilesSame = numpy.array_equal(tile_prevArr, tile_arr)
+                    
+                    if tilesSame:
+                        row.append(-2)
+                        numSame += 1
+                    else:
+                        tile_hash = self._imageHash(tile_img)
+                        if tile_hash in self.tileDict:
+                            row.append(self.tileDict[tile_hash])
+                        else:
+                            row.append(-1)
+                            self._addTileToSet(tile_img)
+                            tileSetChanged = True
+            tileMap.append(row)
+        
+        if tileSetChanged:
+            #If new tiles were added, save the file to disk.
+            #Do this here so that each new tile isn't saved.
+            self._saveSet()
+        
+        #Update the stored image with the current one
+        self.prevArray = new_imgArray
+        
+        #print numSame
+        return tileMap
+            
+    def _imgEqual(self, img1, img2, brute = False):
+        """
+        Returns 'True' if the two images are exactly equal.
+        Compares pixel by pixel.
+        """
+        if not brute:
+            return ImageChops.difference(img1, img2).getbbox() is None
+        else:
+            pixels1 = img1.load()
+            pixels2 = img2.load()
+            img_x, img_y = img1.size
+            for x in range(img_x):
+                for y in range(img_y):
+                    if pixels1[x,y] == pixels2[x,y]:
+                        pass
+                    else:
+                        return False
+            return True
+        
+        
         
     def _imageHash(self, img):
         """

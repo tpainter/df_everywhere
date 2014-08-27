@@ -139,7 +139,7 @@ if __name__ == "__main__":
                 #trimmedShot.save('screenerror%da.png' % tick)
                 pass
                 
-            #Only send a full tile map every 5 ticks, otherwise just send changes
+            #Only send a full tile map every 20 ticks, otherwise just send changes
             if (tick + 1) % 20 == 0:
                 tileMap = tset.parseImage(trimmedShot, returnFullMap = True)
             else:
@@ -203,15 +203,14 @@ if __name__ == "__main__":
     if timing:
         def timeLoop():
             global timedCalls
-            print('Calls per second: %d' % timedCalls)
+            print('Calls per 10 seconds: %d' % timedCalls)
             
             timedCalls = 0
-            reactor.callLater(1, timeLoop)
+            reactor.callLater(10, timeLoop)
     
     if timing:
-        reactor.callLater(1, timeLoop)
+        reactor.callLater(10, timeLoop)
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
-    raw_input('DF Everywhere stopped. Press [enter] to close this window.')
     
