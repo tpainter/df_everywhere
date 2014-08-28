@@ -203,13 +203,13 @@ if __name__ == "__main__":
     if timing:
         def timeLoop():
             global timedCalls
-            print('Calls per 10 seconds: %d' % timedCalls)
+            print('Calls per 5 seconds: %d' % timedCalls)
             
             timedCalls = 0
-            reactor.callLater(10, timeLoop)
+            reactor.callLater(5, timeLoop)
     
     if timing:
-        reactor.callLater(10, timeLoop)
+        reactor.callLater(5, timeLoop)
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
