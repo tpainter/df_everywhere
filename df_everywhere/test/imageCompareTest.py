@@ -1,9 +1,7 @@
 try:
     import Image
-    import ImageChops
 except:
     from PIL import Image
-    from PIL import ImageChops
 
 import timeit
 import numpy
@@ -31,7 +29,10 @@ def equal(im1, im2):
 '''
 
 setup2 = '''
-import ImageChops
+try:
+    import ImageChops
+except:
+    from PIL import ImageChops
 from __main__ import a_img, b_img
 def equal(im1, im2):
     return ImageChops.difference(im1, im2).getbbox() is None 
@@ -47,7 +48,10 @@ def equal(im1, im2):
 '''
 
 setup4 = '''
-import Image
+try:
+    import Image
+except:
+    from PIL import Image
 from __main__ import a_img, b_img
 def equal(im1, im2):
     pixels1 = im1.load()
@@ -74,3 +78,19 @@ print("mmh3 compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup1).r
 print("Difference compare: \t%f" % min(timeit.Timer('equal(a_img, a_img)', setup2).repeat(7, 1000)))
 print("Numpy compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup3).repeat(7, 1000)))
 print("Pixel compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup4).repeat(7, 1000)))
+
+'''RESULTS
+Different images...
+Hash compare: 		0.035925
+mmh3 compare: 		0.030816
+Difference compare: 0.021474
+Numpy compare: 		0.048705
+Pixel compare: 		0.459267
+
+Same images...
+Hash compare: 		0.036136
+mmh3 compare: 		0.030474
+Difference compare: 0.021762
+Numpy compare: 		0.048493
+Pixel compare: 		0.457761
+'''
