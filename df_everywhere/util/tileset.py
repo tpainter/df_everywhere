@@ -359,7 +359,7 @@ class Tileset:
         for y_start in range(tiles_y):
             row  = []
             for x_start in range(tiles_x):
-                tile_arr = new_imgArray[x_start * self.tile_x: y_start * self.tile_y, x_start * self.tile_x + self.tile_x: y_start * self.tile_y + self.tile_y]
+                tile_arr = new_imgArray[y_start * self.tile_y: y_start * self.tile_y + self.tile_y, x_start * self.tile_x: x_start * self.tile_x + self.tile_x]
                 tile_img = new_img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
                 
                 if returnFullMap:
@@ -374,7 +374,7 @@ class Tileset:
                         tileSetChanged = True
                 else:
                     #tile_prevImg = self.prevImage.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))
-                    tile_prevArr = prev_imgArray[x_start * self.tile_x: y_start * self.tile_y, x_start * self.tile_x + self.tile_x: y_start * self.tile_y + self.tile_y]
+                    tile_prevArr = prev_imgArray[y_start * self.tile_y: y_start * self.tile_y + self.tile_y, x_start * self.tile_x: x_start * self.tile_x + self.tile_x]
                     
                     #tilesSame = (tile_prevArr == tile_arr).all()
                     tilesSame = numpy.array_equal(tile_prevArr, tile_arr)

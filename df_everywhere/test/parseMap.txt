@@ -6,3 +6,7 @@ all tiles -> crop, crop, imageEqual
 
 parseImageArray:
 array, all tiles -> array, crop, array, equal
+
+
+image.crop(l,t,r,b)
+array[t,b,l,r)

@@ -12,7 +12,7 @@ a = numpy.random.rand(32,32,3) * 255
 a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
 
 b = numpy.random.rand(32,32,3) * 255
-b_img = Image.fromarray(a.astype('uint8')).convert('RGB')
+b_img = Image.fromarray(b.astype('uint8')).convert('RGB')
 
 
 setup = '''
@@ -80,17 +80,5 @@ print("Numpy compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup3).
 print("Pixel compare: \t\t%f" % min(timeit.Timer('equal(a_img, a_img)', setup4).repeat(7, 1000)))
 
 '''RESULTS
-Different images...
-Hash compare: 		0.035925
-mmh3 compare: 		0.030816
-Difference compare: 0.021474
-Numpy compare: 		0.048705
-Pixel compare: 		0.459267
 
-Same images...
-Hash compare: 		0.036136
-mmh3 compare: 		0.030474
-Difference compare: 0.021762
-Numpy compare: 		0.048493
-Pixel compare: 		0.457761
 '''
