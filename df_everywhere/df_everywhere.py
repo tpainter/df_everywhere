@@ -164,7 +164,8 @@ if __name__ == "__main__":
             client.rpcs.append(d)
             
         if len(client.connection) > 0:
-            client.connection[0].publish("%s.map" % topicPrefix,tileMap)
+            if tileMap != []:
+                client.connection[0].publish("%s.map" % topicPrefix,tileMap)
             
         else:
             print("Waiting for WAMP connection.")
