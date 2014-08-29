@@ -131,6 +131,34 @@ print("Numpy array: \t\t%f" % min(timeit.Timer('equal(c_array, c_array)', setup5
 print("Numpy array2: \t\t%f" % min(timeit.Timer('equal(c_array, c_array)', setup6).repeat(3, 100)))
 print("Numpy array hash: \t%f" % min(timeit.Timer('equal(c_array, c_array)', setup7).repeat(3, 100)))
 
-'''RESULTS
+'''RESULTS-Desktop
+Different images...
+Hash compare: 		0.035704
+mmh3 compare: 		0.030296
+Difference compare: 0.023359
+Numpy compare: 		0.046932
+Pixel compare: 		0.004296
+Numpy array: 		0.012363
+Numpy array2: 		0.017940
+Numpy array hash: 	0.005040
+
+Same images...
+Hash compare: 		0.035535
+mmh3 compare: 		0.030228
+Difference compare: 0.021173
+Numpy compare: 		0.046807
+Pixel compare: 		0.456738
+Numpy array: 		0.012392
+Numpy array2: 		0.017782
+Numpy array hash: 	0.004989
+
+Large image...
+Hash compare: 		1.959854
+mmh3 compare: 		1.428058
+Difference compare: 1.566704
+Numpy compare: 		3.441948
+Numpy array: 		0.599959
+Numpy array2: 		0.602276
+Numpy array hash: 	0.738304
 
 '''
