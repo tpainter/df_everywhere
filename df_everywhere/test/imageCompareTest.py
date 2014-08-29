@@ -161,4 +161,34 @@ Numpy array: 		0.599959
 Numpy array2: 		0.602276
 Numpy array hash: 	0.738304
 
+RESULTS-netbook
+Different images...
+Hash compare: 		0.151597
+mmh3 compare: 		0.135760
+Difference compare: 0.099016
+Numpy compare: 		0.257428
+Pixel compare: 		0.021328
+Numpy array: 		0.069450
+Numpy array2: 		0.096126
+Numpy array hash: 	0.030749
+
+Same images...
+Hash compare: 		0.151313
+mmh3 compare: 		0.136140
+Difference compare: 0.092382
+Numpy compare: 		0.258598
+Pixel compare: 		2.395519
+Numpy array: 		0.072579
+Numpy array2: 		0.099269
+Numpy array hash: 	0.030374
+
+Large image...
+Hash compare: 		7.479523
+mmh3 compare: 		5.561126
+Difference compare: 4.889773
+Numpy compare: 		8.210509
+Numpy array: 		3.528336
+Numpy array2: 		3.563061
+Numpy array hash: 	3.357889
+
 '''
