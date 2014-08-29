@@ -115,7 +115,7 @@ if __name__ == "__main__":
     trimmedShot = utils.trim(shot, debug = False)
     tile_x, tile_y = utils.findTileSize(trimmedShot)
     local_file = utils.findLocalImg(tile_x, tile_y)
-    tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
+    tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     localCommands = sendInput.SendInput(window_handle[0])
         
@@ -141,9 +141,9 @@ if __name__ == "__main__":
                 
             #Only send a full tile map every 20 ticks, otherwise just send changes
             if (tick + 1) % 20 == 0:
-                tileMap = tset.parseImage(trimmedShot, returnFullMap = True)
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = True)
             else:
-                tileMap = tset.parseImage(trimmedShot, returnFullMap = False)
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
             print("Faking tileMap.")
