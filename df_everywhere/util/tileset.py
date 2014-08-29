@@ -17,17 +17,22 @@
 
 try:
     import Image
+    import ImageChops
 except:
     from PIL import Image
+    from PIL import ImageChops
 
+import sys
 from cStringIO import StringIO
+import mmh3
+import numpy
 
 class Tileset:
     """
     Holds details for the tileset.
     """
     
-    def __init__(self, filename, tile_x, tile_y, debug = False):        
+    def __init__(self, filename, tile_x, tile_y, array = False, debug = False):        
         
         self.tile_x = tile_x
         self.tile_y = tile_y
@@ -46,12 +51,15 @@ class Tileset:
             img = Image.open("./tilesets/%s" % filename)
             
         self.debug = debug        
-        self.tileset = img        
+        self.tileset = img      
         
         self.tileDict = {}
         self._parseFilename(self.filename)
         if img is not None:
-            self._loadSet()
+            if array:
+                self._loadSet(array = True)
+            else:
+                self._loadSet()
         
     def _parseFilename(self, filename):
         """
@@ -73,15 +81,18 @@ class Tileset:
             self.imgExtension = file_extension
         else:
             print("Error with tileset filename. Exiting.")
-            exit()
+            sys.exit()
         
-    def _loadSet(self, img = None):
+    def _loadSet(self, img = None, array = False):
         """
         Creates a dictionary from the tileset image.
         """
         
         if img is None:
             img = self.tileset
+            
+        if array:
+            img_array = numpy.array(img)
         
         image_x, image_y = img.size
         
@@ -99,8 +110,10 @@ class Tileset:
                 #Once max tiles in tileset is reached, end the load process
                 if t >= self.tileCount:
                     break
-                    
-                tile = img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))       
+                if array:
+                    tile = img_array[y_start * self.tile_y: y_start * self.tile_y + self.tile_y, x_start * self.tile_x: x_start * self.tile_x + self.tile_x]
+                else:
+                    tile = img.crop((x_start * self.tile_x, y_start * self.tile_y, x_start * self.tile_x + self.tile_x, y_start * self.tile_y + self.tile_y))       
                 
                 #Use the hash of the tile as a key to insure that it is unique
                 tile_hash = self._imageHash(tile)
@@ -109,7 +122,7 @@ class Tileset:
                     #It would be bad to find a duplicate in the tileset.
                     print("Error: Found duplicate tile in tileset. Exiting.")
                     print("t=%d" % t)
-                    exit()
+                    sys.exit()
                 else:
                     self.tileDict[tile_hash] = t
                         
@@ -118,10 +131,13 @@ class Tileset:
         self.tileset = img
         print("Tileset loaded: %s with %d tiles" % (self.filename, t))
             
-    def _addTileToSet(self, img):
+    def _addTileToSet(self, img, array = False):
         """
         Adds new tile to tileset.
         """
+        if array:
+            img = Image.fromarray(img.astype('uint8')).convert('RGB')
+        
         
         #Check that proposed tile matches the tile size of the set
         pTile_x, pTile_y = img.size
@@ -174,7 +190,7 @@ class Tileset:
         #reload new tileset
         self.tileCount += 1
         self.filename = filename
-        self._loadSet(newTileSet)
+        self._loadSet(newTileSet, array)
     
     def _saveSet(self):
         """
@@ -218,7 +234,7 @@ class Tileset:
             #If new tiles were added, save the file to disk.
             #Do this here so that each new tile isn't saved.
             self._saveSet()
-            
+                    
         if returnFullMap:
             #Update fullMap
             self.fullMap[:] = []
@@ -257,16 +273,60 @@ class Tileset:
             print("Difference map exception")
             return newMap
         
+
+    def parseImageArray(self, img, returnFullMap = True):
+        """
+        Parses an image as an array. Returns list of tile positions in map.
+        """
+        img_arr = numpy.array(img)
+        tileMap = []
+        tileSetChanged = False        
+        image_x, image_y = img.size
+        self.screen_x = image_x
+        self.screen_y = image_y
+           
+        tiles_x = image_x / self.tile_x
+        tiles_y = image_y / self.tile_y
+        
+        for y_start in range(tiles_y):
+            row  = []
+            for x_start in range(tiles_x):
+                tile_arr = img_arr[y_start * self.tile_y: y_start * self.tile_y + self.tile_y, x_start * self.tile_x: x_start * self.tile_x + self.tile_x]      
+                
+                #Use the hash of the tile as a key to ensure that it is unique
+                tile_hash = self._imageHash(tile_arr)
+                
+                if tile_hash in self.tileDict:
+                    row.append(self.tileDict[tile_hash]) 
+                else:
+                    row.append(-1)
+                    self._addTileToSet(tile_arr, array = True)
+                    tileSetChanged = True
+                        
+            tileMap.append(row)
+                
+        if tileSetChanged:
+            #If new tiles were added, save the file to disk.
+            #Do this here so that each new tile isn't saved.
+            self._saveSet()
+                    
+        if returnFullMap:
+            #Update fullMap
+            self.fullMap[:] = []
+            self.fullMap.extend(tileMap)
+            return tileMap
+        else:
+            return self._tileMapDifference(tileMap)
+        
     def _imageHash(self, img):
         """
         Returns a hash of the image.
-        """
+        """        
+        #Hash is fast
+        #return hash(img.tostring())
         
-        #Use md5 since this isn't a secure application and speed is helpful.
-        #md5 is 32 characters, img.tostring() for 12x12 is 432 characters
-        #return hashlib.md5(img.tostring()).hexdigest()
-        #Try to speed up hashing by using string hash
-        return str.__hash__(img.tostring())
+        #murmur3 is fastest but not a lot faster than Hash
+        return mmh3.hash(img.tostring())
         
     def wampSend(self):
         """

@@ -40,7 +40,7 @@ if __name__ == "__main__":
         setDebugging(True)
     
     #Use this for timing the number of cycles per second
-    timing = True
+    timing = False
     if timing:
         global timedCalls
         timedCalls = 0
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     trimmedShot = utils.trim(shot, debug = False)
     tile_x, tile_y = utils.findTileSize(trimmedShot)
     local_file = utils.findLocalImg(tile_x, tile_y)
-    tset = tileset.Tileset(local_file, tile_x, tile_y, debug = False)
+    tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     localCommands = sendInput.SendInput(window_handle[0])
         
@@ -139,11 +139,11 @@ if __name__ == "__main__":
                 #trimmedShot.save('screenerror%da.png' % tick)
                 pass
                 
-            #Only send a full tile map every 5 ticks, otherwise just send changes
+            #Only send a full tile map every 20 ticks, otherwise just send changes
             if (tick + 1) % 20 == 0:
-                tileMap = tset.parseImage(trimmedShot, returnFullMap = True)
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = True)
             else:
-                tileMap = tset.parseImage(trimmedShot, returnFullMap = False)
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
             print("Faking tileMap.")
@@ -164,7 +164,8 @@ if __name__ == "__main__":
             client.rpcs.append(d)
             
         if len(client.connection) > 0:
-            client.connection[0].publish("%s.map" % topicPrefix,tileMap)
+            if tileMap != []:
+                client.connection[0].publish("%s.map" % topicPrefix,tileMap)
             
         else:
             print("Waiting for WAMP connection.")
@@ -203,15 +204,14 @@ if __name__ == "__main__":
     if timing:
         def timeLoop():
             global timedCalls
-            print('Calls per second: %d' % timedCalls)
+            print('Calls per 5 seconds: %d' % timedCalls)
             
             timedCalls = 0
-            reactor.callLater(1, timeLoop)
+            reactor.callLater(5, timeLoop)
     
     if timing:
-        reactor.callLater(1, timeLoop)
+        reactor.callLater(5, timeLoop)
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
-    raw_input('DF Everywhere stopped. Press [enter] to close this window.')
     
