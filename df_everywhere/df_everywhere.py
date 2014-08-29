@@ -40,7 +40,7 @@ if __name__ == "__main__":
         setDebugging(True)
     
     #Use this for timing the number of cycles per second
-    timing = True
+    timing = False
     if timing:
         global timedCalls
         timedCalls = 0
