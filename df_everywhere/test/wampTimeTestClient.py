@@ -42,8 +42,8 @@ class ComponentClient(ApplicationSession):
 
 if __name__ == '__main__':
    from autobahn.twisted.wamp import ApplicationRunner
-   #runner = ApplicationRunner("ws://router1.dfeverywhere.com:7081/ws", "realm1")
+   runner = ApplicationRunner("ws://router1.dfeverywhere.com:7081/ws", "realm1")
    #runner = ApplicationRunner("ws://192.168.0.20:7081/ws", "realm1")
    #runner = ApplicationRunner("ws://54.68.14.163:7081/ws", "realm1")
-   runner = ApplicationRunner("ws://23.251.147.152:7081/ws", "realm1")
+   #runner = ApplicationRunner("ws://23.251.147.152:7081/ws", "realm1")
    runner.run(ComponentClient)
