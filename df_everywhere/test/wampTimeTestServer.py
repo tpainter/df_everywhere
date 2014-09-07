@@ -26,8 +26,9 @@ class ComponentServer(ApplicationSession):
 
 if __name__ == '__main__':
    from autobahn.twisted.wamp import ApplicationRunner
-   runner = ApplicationRunner("ws://router1.dfeverywhere.com:7081/ws", "realm1") #0.1 BuyVM ping:.083
+   #runner = ApplicationRunner("ws://router1.dfeverywhere.com:7081/ws", "realm1") 
+   #0.1 BuyVM ping:.083
    #runner = ApplicationRunner("ws://192.168.0.20:7081/ws", "realm1") #0.008 local
    #runner = ApplicationRunner("ws://54.68.14.163:7081/ws", "realm1") #0.08 AWS-micro
-   #runner = ApplicationRunner("ws://23.251.147.152:7081/ws", "realm1") #0.05 google-micro ping:.043
+   runner = ApplicationRunner("ws://23.251.145.186:7081/ws", "realm1") #0.05 google-micro ping:.043 
    runner.run(ComponentServer)
