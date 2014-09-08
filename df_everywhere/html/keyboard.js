@@ -6,7 +6,7 @@ function sendKey(toSend) {
         //Just send the text string, the server handles checking its validity
         //console.log(toSend);
         //wamp_session.publish('df_everywhere.g1.commands', ['test']);
-        wamp_session.publish('df_everywhere.g1.commands', [toSend]);
+        wamp_session.publish('df_everywhere.private3.commands', [toSend]);
     }
     else {
         console.log("No connection to send to.");
@@ -157,8 +157,8 @@ Mousetrap.bind({
     'pagedown': function() { sendKey('pagedown'); },
     'end': function() { sendKey('end'); },
     'home': function() { sendKey('home'); },
-    'left': function() { sendKey('left'); },
-    'up': function() { sendKey('up'); },
-    'right': function() { sendKey('right'); },
-    'down': function() { sendKey('down'); }
+    'left': function() { sendKey('left'); return false; },
+    'up': function() { sendKey('up'); return false; },
+    'right': function() { sendKey('right'); return false; },
+    'down': function() { sendKey('down'); return false; }
 });

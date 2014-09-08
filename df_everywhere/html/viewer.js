@@ -80,6 +80,10 @@ var spinOpts = {
 var spinTarget = document.getElementById('DfDisplay');
 var spinner = new Spinner(spinOpts).spin(spinTarget);
 
+function request_draw_image(tile_map){
+    //Wraps requestAnimationFrame around draw
+    requestAnimationFrame(function() {draw_image(tile_map);});
+}
 function draw_image(tile_map){
     if (tileset.loaded){
         //stop spinner
@@ -109,7 +113,7 @@ function update_tileset(fname){
         console.log("Updating tileset name:" + fname[0]);
         tileset.tileImageName = fname[0];
         //Request tileset image via websockets
-        wamp_session.call('df_everywhere.g1.tilesetimage').then(
+        wamp_session.call('df_everywhere.private3.tilesetimage').then(
             function (str) {
                 console.log("Receiving image data");
                 //tileset_image.src = "data:image/png;base64," + window.btoa(str);
@@ -161,9 +165,10 @@ try {
 }
 
 var connection = new autobahn.Connection({
-   url: 'ws://dfeverywhere.com:7081/ws',
+   url: 'ws://router1.dfeverywhere.com:7081/ws',
    realm: 'realm1'}
 );
+console.log("trying connection");
 
 //Setup Autobahn for WAMP connection
 connection.onopen = function (session) {
@@ -173,20 +178,20 @@ connection.onopen = function (session) {
     wamp_session = session;
 
    //subscribe to tilemap
-   session.subscribe("df_everywhere.g1.map", draw_image);
+   session.subscribe("df_everywhere.private3.map", request_draw_image);
    
    //subscribe to tileset updates
-   session.subscribe("df_everywhere.g1.tileset", update_tileset);
+   session.subscribe("df_everywhere.private3.tileset", update_tileset);
    
    //subscribe to tile size updates
-   session.subscribe("df_everywhere.g1.tilesize", update_tilesize);
+   session.subscribe("df_everywhere.private3.tilesize", update_tilesize);
    
    //subscribe to screensize updates
-   session.subscribe("df_everywhere.g1.screensize", update_screensize);
+   session.subscribe("df_everywhere.private3.screensize", update_screensize);
    
    //send heartbeats every 30 seconds
-   session.publish("df_everywhere.g1.heartbeats", ['beat']);
-   setInterval(function(){session.publish("df_everywhere.g1.heartbeats", ['beat']);}, 30 * 1000);
+   session.publish("df_everywhere.private3.heartbeats", ['beat']);
+   setInterval(function(){session.publish("df_everywhere.private3.heartbeats", ['beat']);}, 30 * 1000);
 };
 
 connection.open();
