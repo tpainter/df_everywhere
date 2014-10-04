@@ -188,7 +188,7 @@ def findTileSize(img):
     print("Tile size found: %dx%d" % (tile_x, tile_y))
     if tile_x < 7:
         print("Error: Tile size too small")
-        exit()
+        return 0, 0
     
     return tile_x, tile_y
     

@@ -22,6 +22,7 @@ if __name__ == "__main__":
     """
     import sys
     from sys import platform as _platform
+    import time
     import ConfigParser
     from twisted.internet import reactor
     from twisted.internet.defer import inlineCallbacks    
@@ -114,6 +115,19 @@ if __name__ == "__main__":
     
     trimmedShot = utils.trim(shot, debug = False)
     tile_x, tile_y = utils.findTileSize(trimmedShot)
+    
+    #loop through finding a tile size until it is successful
+    if (tile_x == 0) or (tile_y == 0):
+        while True:
+            time.sleep(2)
+            shot = utils.screenshot(window_handle[0], debug = False)
+            trimmedShot = utils.trim(shot, debug = False)
+            if trimmedShot is not None:
+                tile_x, tile_y = utils.findTileSize(trimmedShot)
+                if (tile_x != 0) or (tile_y != 0):
+                    break
+    
+    
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
