@@ -27,7 +27,7 @@ if __name__ == "__main__":
     from twisted.internet import reactor
     from twisted.internet.defer import inlineCallbacks    
     
-    from util import wamp_local, utils, tileset, sendInput, messages
+    from util import wamp_local, utils, tileset, sendInput, messages, game
     
     #Change this to True for enhanced debugging    
     edebug = False
@@ -42,9 +42,6 @@ if __name__ == "__main__":
     
     #Use this for timing the number of cycles per second
     timing = False
-    if timing:
-        global timedCalls
-        timedCalls = 0
     
     
     messages.welcome()
@@ -69,25 +66,20 @@ if __name__ == "__main__":
         #If file is missing, start local server
         web_topic = ''
         web_key = ''
-        need_wamp_server = True
     
-    if (web_topic == '') and (web_key == ''):
+    if (web_topic == '') or (web_key == ''):
         #No credentials entered, ask for credentials to be entered
         print("No configuration details entered. Please add your credentials to 'dfeverywhere.conf'.")
         raw_input('DF Everywhere stopped. Press [enter] to close this window.')
         sys.exit()
         
-    if need_wamp_server:
-        #Start WAMP server
-        wamp_local.wampServ("ws://localhost:7081/ws", "tcp:7081", False)
+
     
-    #Start WAMP client
-    client = wamp_local.WampHolder()
-    if need_wamp_server:
-        #Connect to local server
-        client.connection = wamp_local.wampClient("ws://192.168.0.20:7081/ws", "tcp:192.168.0.20:7081")
-    else:
-        client.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", web_topic, web_key)
+    
+    
+    
+    
+    
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
@@ -131,9 +123,14 @@ if __name__ == "__main__":
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
-    localCommands = sendInput.SendInput(window_handle[0])
+    #Start WAMP client
+    client_control = game.Game(web_topic, web_key, window_handle[0])
+    
+    client_control.tileset = tset
+    
+    #localCommands = sendInput.SendInput(window_handle[0])
         
-    @inlineCallbacks
+    #@inlineCallbacks
     def keepGoing(tick):
         try:
             shot = utils.screenshot(window_handle[0], debug = False)
@@ -163,68 +160,23 @@ if __name__ == "__main__":
             print("Faking tileMap.")
             tileMap = []
                 
-        if len(client.connection) > 0 and len(client.subscriptions) < 1:
+        if len(client_control.connection) > 0 and len(client_control.subscriptions) < 1:
             #add a subscription once
-            d = yield client.connection[0].subscribe(localCommands.receiveCommand, '%s.commands' % topicPrefix)
-            d1 = yield client.connection[0].subscribe(client.receiveHeartbeats, '%s.heartbeats' % topicPrefix)
+            #d = yield client_control.connection[0].subscribe(localCommands.receiveCommand, '%s.commands' % topicPrefix)
+            #d1 = yield client_control.connection[0].subscribe(client_control.receiveHeartbeats, '%s.heartbeats' % topicPrefix)
             
-            client.subscriptions.append(d)
+            #client_control.subscriptions.append(d1)
             print("WAMP connected...")
             
-        if len(client.connection) > 0 and len(client.rpcs) < 1:
-            #register a rpc once
-            d = yield client.connection[0].register(tset.wampSend, '%s.tilesetimage' % topicPrefix)
-            
-            client.rpcs.append(d)
-            
-        if len(client.connection) > 0:
-            if tileMap != []:
-                client.connection[0].publish("%s.map" % topicPrefix,tileMap)
-            
-        else:
-            print("Waiting for WAMP connection.")
         
-                    
-        #Periodically publish the latest tileset filename
-        if tick % 10 == 0:
-            if len(client.connection) > 0:
-                client.connection[0].publish("%s.tileset" % topicPrefix, tset.filename)
-                
+        client_control._sendTileMap(tileMap)
         
-        #Periodically publish the screen size and tile size
-        if tick % 50 == 1:
-            if len(client.connection) > 0:
-                client.connection[0].publish("%s.tilesize" % topicPrefix, [tset.tile_x, tset.tile_y])
-                #Only send screen size update if it makes sense
-                if (tset.screen_x % tset.tile_x == 0) and (tset.screen_y % tset.tile_y == 0):
-                    client.connection[0].publish("%s.screensize" % topicPrefix, [tset.screen_x, tset.screen_y])
-        
-        #Deal with heartbeats
-        if client.heartbeatCounter > 0:
-                client.heartbeatCounter -= 1
-                
-                if timing:
-                    global timedCalls
-                    timedCalls += 1
-                
-                reactor.callLater(0, keepGoing, tick + 1)            
-        else:
-            #No clients have connected recently, slow processing
-            if not client.slowed:
-                print("No hearbeats received, slowing...")
-                client.slowed = True
+        if client_control.slowed:
             reactor.callLater(0.5, keepGoing, tick + 1)
-    
-    if timing:
-        def timeLoop():
-            global timedCalls
-            print('Calls per 5 seconds: %d' % timedCalls)
-            
-            timedCalls = 0
-            reactor.callLater(5, timeLoop)
-    
-    if timing:
-        reactor.callLater(5, timeLoop)
+        else:
+            reactor.callLater(0, keepGoing, tick + 1)
+        
+
     
     reactor.callLater(0, keepGoing, 0)
     reactor.run()
