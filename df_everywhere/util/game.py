@@ -21,7 +21,7 @@
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks   
 
-from util import wamp_local, sendInput
+from util import wamp_local, sendInput, utils
 
 class Game():
     """
@@ -144,6 +144,36 @@ class Game():
         """
         Handles periodically running screen grabs.
         """
+        try:
+            shot = utils.screenshot(self.window_hnd, debug = False)
+            #Need to check that an image was returned.
+            shot_x, shot_y = shot.size
+        except:
+            print("Error getting image. Exiting.")
+            reactor.stop()
+        
+        trimmedShot = utils.trim(shot, debug = False) 
+        
+        if trimmedShot is not None:
+            
+            '''
+            #Only send a full tile map every 20 ticks, otherwise just send changes
+            if (tick + 1) % 20 == 0:
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = True)
+            else:
+                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = False)
+            '''
+            tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
+        else:
+            #If there was an error getting the tilemap, fake one.
+            print("Image error. Try moving Dwarf Fortress window to main display.")
+            tileMap = []
+        
+        self._sendTileMap(tileMap)
+        
+        
+        
+        
         
         
         reactor.callLater(self.screenDelay, self._loopScreen)
@@ -179,9 +209,6 @@ class Game():
                     self.connection[0].publish("%s.screensize" % self.topicPrefix, [self.tileset.screen_x, self.tileset.screen_y])
         
         reactor.callLater(self.sizeDelay, self._loopScreenSize)
-        
-
-        
         
     def _sendTileMap(self, tilemap):
         """

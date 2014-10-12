@@ -72,13 +72,6 @@ if __name__ == "__main__":
         print("No configuration details entered. Please add your credentials to 'dfeverywhere.conf'.")
         raw_input('DF Everywhere stopped. Press [enter] to close this window.')
         sys.exit()
-        
-
-    
-    
-    
-    
-    
     
             
     #Change screenshot method based on operating system    
@@ -128,56 +121,5 @@ if __name__ == "__main__":
     
     client_control.tileset = tset
     
-    #localCommands = sendInput.SendInput(window_handle[0])
-        
-    #@inlineCallbacks
-    def keepGoing(tick):
-        try:
-            shot = utils.screenshot(window_handle[0], debug = False)
-            shot_x, shot_y = shot.size
-        except:
-            print("Error getting screen shot. Exiting.")
-            shot = None
-            reactor.stop()
-        
-        trimmedShot = utils.trim(shot, debug = False)       
-        
-        if trimmedShot is not None:
-            trimmedShot_x, trimmedShot_y = trimmedShot.size
-            if (trimmedShot_x != tset.screen_x) or (trimmedShot_y != tset.screen_y):
-                #print("Error with screen dimensions.")
-                #shot.save('screenerror%d.png' % tick)
-                #trimmedShot.save('screenerror%da.png' % tick)
-                pass
-                
-            #Only send a full tile map every 20 ticks, otherwise just send changes
-            if (tick + 1) % 20 == 0:
-                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = True)
-            else:
-                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = False)
-        else:
-            #If there was an error getting the tilemap, fake one.
-            print("Faking tileMap.")
-            tileMap = []
-                
-        if len(client_control.connection) > 0 and len(client_control.subscriptions) < 1:
-            #add a subscription once
-            #d = yield client_control.connection[0].subscribe(localCommands.receiveCommand, '%s.commands' % topicPrefix)
-            #d1 = yield client_control.connection[0].subscribe(client_control.receiveHeartbeats, '%s.heartbeats' % topicPrefix)
-            
-            #client_control.subscriptions.append(d1)
-            print("WAMP connected...")
-            
-        
-        client_control._sendTileMap(tileMap)
-        
-        if client_control.slowed:
-            reactor.callLater(0.5, keepGoing, tick + 1)
-        else:
-            reactor.callLater(0, keepGoing, tick + 1)
-        
-
-    
-    reactor.callLater(0, keepGoing, 0)
     reactor.run()
     
