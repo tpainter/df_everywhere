@@ -18,7 +18,7 @@
 #
 # 
 #
-from twisted.internet import reactor
+from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks   
 
 from util import wamp_local, sendInput, utils
@@ -94,7 +94,7 @@ class Game():
                 reactor.callLater(self.sizeDelay, self._loopScreenSize)
                 reactor.callLater(self.heartbeatDelay, self._loopHeartbeat)
                 if self.fps:
-                    reactor.callLater(1, self._loopPrintFps)
+                    reactor.callLater(5, self._loopPrintFps)
             
     @inlineCallbacks
     def _registerRPC(self):
@@ -146,6 +146,7 @@ class Game():
         
         reactor.callLater(self.heartbeatDelay, self._loopHeartbeat)
         
+    #@inlineCallbacks
     def _loopScreen(self):
         """
         Handles periodically running screen grabs.
@@ -165,8 +166,10 @@ class Game():
             #Only send a full tile map every 20 cycles, otherwise just send changes
             if (self.screenCycles) % 20 == 0:
                 tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
+                #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = True)
             else:
                 tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = False)
+                #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
             print("Image error. Try moving Dwarf Fortress window to main display.")
@@ -224,9 +227,9 @@ class Game():
         """
         Print number of screen grabs per second.
         """
-        print("FPS: %d" % self.fps_counter)
+        print("FPS: %0.1f" % (self.fps_counter/5.0))
         self.fps_counter = 0
         
         if self.fps:
-            reactor.callLater(1, self._loopPrintFps)
+            reactor.callLater(5, self._loopPrintFps)
         
