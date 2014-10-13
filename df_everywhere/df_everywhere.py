@@ -60,10 +60,12 @@ if __name__ == "__main__":
             Config.read(".\dfeverywhere.conf")
         web_topic = Config.get('dfeverywhere', 'TOPIC')
         web_key = Config.get('dfeverywhere', 'KEY')
-        need_wamp_server = False
-        topicPrefix = "df_everywhere.%s" % web_topic
+        try:
+            show_fps = Config.getboolean('dfeverywhere', 'FPS')
+        except:
+            show_fps = False
     except:
-        #If file is missing, start local server
+        #If file is missing, return blanks
         web_topic = ''
         web_key = ''
     
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     #Start WAMP client
-    client_control = game.Game(web_topic, web_key, window_handle[0], fps = True)
+    client_control = game.Game(web_topic, web_key, window_handle[0], fps = show_fps)
     
     client_control.tileset = tset
     

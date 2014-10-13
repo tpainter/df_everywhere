@@ -45,6 +45,7 @@ class Game():
         self.filenameDelay = 5
         self.sizeDelay = 5
         self.heartbeatDelay = 1
+        self.screenCycles = 0
         
         ### WAMP details
         self.topicPrefix = "df_everywhere.%s" % web_topic
@@ -161,20 +162,18 @@ class Game():
         
         if trimmedShot is not None:
             
-            '''
-            #Only send a full tile map every 20 ticks, otherwise just send changes
-            if (tick + 1) % 20 == 0:
-                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = True)
+            #Only send a full tile map every 20 cycles, otherwise just send changes
+            if (self.screenCycles) % 20 == 0:
+                tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
             else:
-                tileMap = tset.parseImageArray(trimmedShot, returnFullMap = False)
-            '''
-            tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
+                tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
             print("Image error. Try moving Dwarf Fortress window to main display.")
             tileMap = []
         
         self._sendTileMap(tileMap)
+        self.screenCycles += 1
         
         if self.fps:
             self.fps_counter += 1
