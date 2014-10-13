@@ -28,7 +28,10 @@ class Game():
     Object to hold all program states and connections.
     """
     
-    def __init__(self, web_topic, web_key, window_hnd):
+    def __init__(self, web_topic, web_key, window_hnd, fps = False):
+        ### FPS reports
+        self.fps = fps
+        self.fps_counter = 0
         
         ### Tileset
         self.tileset = None
@@ -89,6 +92,8 @@ class Game():
                 reactor.callLater(self.sizeDelay, self._loopTileSize)
                 reactor.callLater(self.sizeDelay, self._loopScreenSize)
                 reactor.callLater(self.heartbeatDelay, self._loopHeartbeat)
+                if self.fps:
+                    reactor.callLater(1, self._loopPrintFps)
             
     @inlineCallbacks
     def _registerRPC(self):
@@ -171,10 +176,8 @@ class Game():
         
         self._sendTileMap(tileMap)
         
-        
-        
-        
-        
+        if self.fps:
+            self.fps_counter += 1
         
         reactor.callLater(self.screenDelay, self._loopScreen)
         
@@ -217,3 +220,14 @@ class Game():
         if self.connected:
             if tilemap != []:
                 self.connection[0].publish("%s.map" % self.topicPrefix, tilemap)
+                
+    def _loopPrintFps(self):
+        """
+        Print number of screen grabs per second.
+        """
+        print("FPS: %d" % self.fps_counter)
+        self.fps_counter = 0
+        
+        if self.fps:
+            reactor.callLater(1, self._loopPrintFps)
+        

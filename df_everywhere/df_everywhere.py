@@ -117,7 +117,7 @@ if __name__ == "__main__":
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     #Start WAMP client
-    client_control = game.Game(web_topic, web_key, window_handle[0])
+    client_control = game.Game(web_topic, web_key, window_handle[0], fps = True)
     
     client_control.tileset = tset
     
