@@ -164,6 +164,7 @@ class Game():
         if trimmedShot is not None:
             
             #Only send a full tile map every 20 cycles, otherwise just send changes
+            #This is slower with deferToThread
             if (self.screenCycles) % 20 == 0:
                 tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
                 #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = True)
