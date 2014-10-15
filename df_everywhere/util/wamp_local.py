@@ -56,27 +56,6 @@ class SubpubTileset(ApplicationSession):
             self.factory._myConnection.remove(self)
         self.disconnect()
         
-class WampHolder:
-    """
-    Container for references to WAMP client connections and subscriptions.
-    """
-    
-    def __init__(self):
-        self.connection = []
-        self.subscriptions = []
-        self.rpcs = []
-        self.heartbeatCounter = 100
-        self.slowed = False
-        
-    def receiveHeartbeats(self, recv):
-        """
-        Tracks heartbeats from clients. Ignore 'recv'.
-        """
-        #On hearbeat, reset counter.
-        self.heartbeatCounter = 500
-        if self.slowed:
-            print("Heartbeat received. Resuming.")
-            self.slowed = False
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """
