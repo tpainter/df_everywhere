@@ -27,6 +27,8 @@ from cStringIO import StringIO
 import mmh3
 import numpy
 
+import prettyConsole
+
 class Tileset:
     """
     Holds details for the tileset.
@@ -129,7 +131,7 @@ class Tileset:
                 t += 1
                         
         self.tileset = img
-        print("Tileset loaded: %s with %d tiles" % (self.filename, t))
+        prettyConsole.console('log', "Tileset loaded: %s with %d tiles" % (self.filename, t))
             
     def _addTileToSet(self, img, array = False):
         """
@@ -144,7 +146,7 @@ class Tileset:
         if (pTile_x == self.tile_x) and (pTile_y == self.tile_y):
             pass
         else:
-            print("Add tile error: tile dimensions do not match tileset")
+            prettyConsole.console('log', "Add tile error: tile dimensions do not match tileset")
             return
             
         if self.tileset is not None:
@@ -197,7 +199,7 @@ class Tileset:
         Saves tileset image to disk
         """
         
-        print("Saving new tileset image: %s" % self.filename)
+        prettyConsole.console('log', "Saving new tileset image: %s" % self.filename)
         self.tileset.save("./tilesets/%s" % self.filename, optimize = True )
         
     def parseImage(self, img, returnFullMap = True):
@@ -270,7 +272,7 @@ class Tileset:
                 self.prevDifMap.extend(differenceMap)
                 return differenceMap
         except:
-            print("Difference map exception")
+            prettyConsole.console('log', "Difference map exception")
             return newMap
         
 

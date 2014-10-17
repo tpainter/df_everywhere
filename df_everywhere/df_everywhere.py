@@ -27,7 +27,7 @@ if __name__ == "__main__":
     from twisted.internet import reactor
     from twisted.internet.defer import inlineCallbacks    
     
-    from util import wamp_local, utils, tileset, sendInput, messages, game
+    from util import wamp_local, utils, tileset, sendInput, messages, game, consoleInput
     
     #Change this to True for enhanced debugging    
     edebug = False
@@ -118,9 +118,12 @@ if __name__ == "__main__":
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
-    #Start WAMP client
-    client_control = game.Game(web_topic, web_key, window_handle[0], fps = show_fps)
+    #Start input handler
+    inputHandler = consoleInput.ConsoleInput()
+    reactor.callWhenRunning(inputHandler.start)
     
+    #Start WAMP client
+    client_control = game.Game(web_topic, web_key, window_handle[0], fps = show_fps)    
     client_control.tileset = tset
     
     reactor.run()

@@ -21,7 +21,7 @@
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks   
 
-from util import wamp_local, sendInput, utils
+from util import wamp_local, sendInput, utils, prettyConsole
 
 class Game():
     """
@@ -70,18 +70,18 @@ class Game():
         Handles waiting for WAMP connection before continuing loading program.
         """
         if self.connection is None:
-            print("Waiting for connection...")
+            prettyConsole.console('log', "Waiting for connection...")
             #Wait and test again
             reactor.callLater(0.5, self._waitForConnection)
         else:
             try:
                 a = self.connection[0]
             except:
-                print("Still waiting for connection...")
+                prettyConsole.console('log', "Still waiting for connection...")
                 #Wait and test again
                 reactor.callLater(0.5, self._waitForConnection)
             else:
-                print("Connected...")
+                prettyConsole.console('log', "Connected...")
                 self.connected = True
                 reactor.callLater(0, self._registerRPC)
                 reactor.callLater(0, self._subscribeCommands)
@@ -127,7 +127,7 @@ class Game():
         #On hearbeat, reset counter.
         self.heartbeatCounter = 120
         if self.slowed:
-            print("Viewer connected. Resuming...")
+            prettyConsole.console('log', "Viewer connected. Resuming...")
             self.slowed = False
             
     def _loopHeartbeat(self):
@@ -139,7 +139,7 @@ class Game():
             
         if self.heartbeatCounter < 1:
             if not self.slowed:
-                print("No viewers connected, slowing...")
+                prettyConsole.console('log', "No viewers connected, slowing...")
             self.slowed = True
         else:
             self.slowed = False            
@@ -173,7 +173,7 @@ class Game():
                 #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
-            print("Image error. Try moving Dwarf Fortress window to main display.")
+            prettyConsole.console('log', "Image error. Try moving Dwarf Fortress window to main display.")
             tileMap = []
         
         self._sendTileMap(tileMap)
@@ -228,7 +228,7 @@ class Game():
         """
         Print number of screen grabs per second.
         """
-        print("FPS: %0.1f" % (self.fps_counter/5.0))
+        prettyConsole.console('update', "FPS: %0.1f" % (self.fps_counter/5.0))
         self.fps_counter = 0
         
         if self.fps:
