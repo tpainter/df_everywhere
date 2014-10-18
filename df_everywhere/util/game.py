@@ -238,8 +238,7 @@ class Game():
         """
         Cleanly stop connection and shutdown.
         """
-        
         self.connected = False
         self.connection[0].disconnect()
-        reactor.callLater(5, reactor.stop)
+        reactor.callLater(2, reactor.stop)
         
