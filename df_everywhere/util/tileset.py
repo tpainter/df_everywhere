@@ -85,7 +85,7 @@ class Tileset:
             print("Error with tileset filename. Exiting.")
             sys.exit()
         
-    def _loadSet(self, img = None, array = False):
+    def _loadSet(self, img = None, array = False, verbose = True):
         """
         Creates a dictionary from the tileset image.
         """
@@ -131,9 +131,10 @@ class Tileset:
                 t += 1
                         
         self.tileset = img
-        prettyConsole.console('log', "Tileset loaded: %s with %d tiles" % (self.filename, t))
+        if verbose:
+            prettyConsole.console('log', "Tileset loaded: %s with %d tiles" % (self.filename, t))
             
-    def _addTileToSet(self, img, array = False):
+    def _addTileToSet(self, img, array = False, verbose = True):
         """
         Adds new tile to tileset.
         """
@@ -192,7 +193,7 @@ class Tileset:
         #reload new tileset
         self.tileCount += 1
         self.filename = filename
-        self._loadSet(newTileSet, array)
+        self._loadSet(newTileSet, array, verbose)
     
     def _saveSet(self):
         """
@@ -282,6 +283,7 @@ class Tileset:
         """
         img_arr = numpy.array(img)
         tileMap = []
+        addTilesDict = {}
         tileSetChanged = False        
         image_x, image_y = img.size
         self.screen_x = image_x
@@ -302,7 +304,11 @@ class Tileset:
                     row.append(self.tileDict[tile_hash]) 
                 else:
                     row.append(-1)
-                    self._addTileToSet(tile_arr, array = True)
+                    if tile_hash in addTilesDict:
+                        pass
+                    else:
+                        addTilesDict[tile_hash] = tile_arr
+                    #self._addTileToSet(tile_arr, array = True)
                     tileSetChanged = True
                         
             tileMap.append(row)
@@ -310,6 +316,8 @@ class Tileset:
         if tileSetChanged:
             #If new tiles were added, save the file to disk.
             #Do this here so that each new tile isn't saved.
+            for k in addTilesDict.keys():
+                self._addTileToSet(addTilesDict[k], array = True, verbose = False)
             self._saveSet()
                     
         if returnFullMap:
