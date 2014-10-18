@@ -233,4 +233,13 @@ class Game():
         
         if self.fps:
             reactor.callLater(5, self._loopPrintFps)
+            
+    def stopClean(self):
+        """
+        Cleanly stop connection and shutdown.
+        """
+        
+        self.connected = False
+        self.connection[0].disconnect()
+        reactor.callLater(5, reactor.stop)
         

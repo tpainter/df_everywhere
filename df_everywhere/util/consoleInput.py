@@ -6,6 +6,10 @@ from twisted.internet import reactor
 
 
 class ConsoleInput(object):
+
+    def __init__(self, stopFunction):
+        self.stopFunction = stopFunction
+    
     def start(self):
         self.terminator = 'q'
         self.getKey = _Getch()
@@ -14,7 +18,7 @@ class ConsoleInput(object):
         if s != self.terminator:
             _deferToThread(self.getKey).addCallback(self.startReceiving)
         else:
-            reactor.stop()
+            self.stopFunction()
 
 
 class _Getch:
