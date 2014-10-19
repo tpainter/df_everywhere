@@ -40,9 +40,6 @@ if __name__ == "__main__":
         from twisted.internet.defer import setDebugging
         setDebugging(True)
     
-    #Use this for timing the number of cycles per second
-    timing = False
-    
     
     messages.welcome()
     
@@ -105,7 +102,9 @@ if __name__ == "__main__":
     
     #loop through finding a tile size until it is successful
     if (tile_x == 0) or (tile_y == 0):
+        i = 0
         while True:
+            i+= 1
             time.sleep(2)
             shot = utils.screenshot(window_handle[0], debug = False)
             trimmedShot = utils.trim(shot, debug = False)
@@ -113,18 +112,22 @@ if __name__ == "__main__":
                 tile_x, tile_y = utils.findTileSize(trimmedShot)
                 if (tile_x != 0) or (tile_y != 0):
                     break
+            
+            if i > 30:
+                #End program after about 60 seconds
+                sys.exit(0)
     
     
     local_file = utils.findLocalImg(tile_x, tile_y)
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
-    #Start input handler
-    inputHandler = consoleInput.ConsoleInput()
-    reactor.callWhenRunning(inputHandler.start)
-    
     #Start WAMP client
     client_control = game.Game(web_topic, web_key, window_handle[0], fps = show_fps)    
     client_control.tileset = tset
+    
+    #Start input handler
+    inputHandler = consoleInput.ConsoleInput(client_control.stopClean)
+    reactor.callWhenRunning(inputHandler.start)
     
     reactor.run()
     
