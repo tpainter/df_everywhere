@@ -25,7 +25,7 @@ except:
 import sys
 from cStringIO import StringIO
 import mmh3
-import numpy
+from numpy import array as np_array
 
 import prettyConsole
 
@@ -94,7 +94,7 @@ class Tileset:
             img = self.tileset
             
         if array:
-            img_array = numpy.array(img)
+            img_array = np_array(img)
         
         image_x, image_y = img.size
         
@@ -281,7 +281,7 @@ class Tileset:
         """
         Parses an image as an array. Returns list of tile positions in map.
         """
-        img_arr = numpy.array(img)
+        img_arr = np_array(img)
         tileMap = []
         addTilesDict = {}
         tileSetChanged = False        
