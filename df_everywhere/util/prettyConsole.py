@@ -60,5 +60,5 @@ def _update(text):
     global _consoleWidth
     
     _lastUpdate = text
-    sys.stdout.write("{0:<{1}}\r".format(text, _consoleWidth))
+    sys.stdout.write("Press [q] to exit. {0:<{1}}\r".format(text, _consoleWidth))
     
