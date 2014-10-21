@@ -23,10 +23,13 @@ http://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
 
 import sys
 
+from util import getTerminalSize
+
 #This is a global.
 _lastUpdate = ''
-#set this to default 50 characters for now.  Find this programatically in future.
-_consoleWidth = 50
+
+sizex, sizey = getTerminalSize.getTerminalSize()
+_consoleWidth = sizex
 
 def console(kind, text):
     """
@@ -48,7 +51,7 @@ def _log(text):
     global _consoleWidth
     
     outputString = text
-    sys.stdout.write("{0:<{1}}\n".format(text, _consoleWidth))
+    sys.stdout.write("{0:<{1}}\n".format(text, _consoleWidth - 1))
     _update(_lastUpdate)
     
 def _update(text):
@@ -60,5 +63,5 @@ def _update(text):
     global _consoleWidth
     
     _lastUpdate = text
-    sys.stdout.write("Press [q] to exit. {0:<{1}}\r".format(text, _consoleWidth))
+    sys.stdout.write("{0:<{1}}\r".format("Press [q] to exit. "+ text, _consoleWidth - 1))
     
