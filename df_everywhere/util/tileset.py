@@ -25,7 +25,7 @@ except:
 import sys
 from cStringIO import StringIO
 import mmh3
-from numpy import array as np_array
+import numpy
 
 import prettyConsole
 
@@ -94,7 +94,7 @@ class Tileset:
             img = self.tileset
             
         if array:
-            img_array = np_array(img)
+            img_array = numpy.array(img)
         
         image_x, image_y = img.size
         
@@ -281,7 +281,7 @@ class Tileset:
         """
         Parses an image as an array. Returns list of tile positions in map.
         """
-        img_arr = np_array(img)
+        img_arr = numpy.ascontiguousarray(img)
         tileMap = []
         addTilesDict = {}
         tileSetChanged = False        
@@ -292,6 +292,41 @@ class Tileset:
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
         
+        # from: http://stackoverflow.com/questions/8070349/using-numpy-stride-tricks-to-get-non-overlapping-array-blocks
+        sz = img_arr.itemsize
+        h,w = image_x, image_y
+        bh,bw = self.tile_y, self.tile_x
+        shape = (h/bh, w/bw, bh, bw)
+
+        strides = sz*numpy.array([w*bh,bw,w,1])
+
+        blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
+        print shape
+        row = []
+        i = 0
+        for block in blocks:
+            tile_hash = self._imageHash(block)
+            
+            if tile_hash in self.tileDict:
+                row.append(self.tileDict[tile_hash]) 
+            else:
+                row.append(-1)
+                if tile_hash in addTilesDict:
+                    pass
+                else:
+                    addTilesDict[tile_hash] = block
+                    b = block
+                    prettyConsole.console('log', b.shape)
+                    from twisted.internet import reactor
+                    reactor.stop()
+                tileSetChanged = True
+                
+            i += 1
+            if i == tiles_x:
+                tileMap.append(row)
+                row = []
+        
+        '''
         for y_start in range(tiles_y):
             row  = []
             for x_start in range(tiles_x):
@@ -312,6 +347,7 @@ class Tileset:
                     tileSetChanged = True
                         
             tileMap.append(row)
+        '''
                 
         if tileSetChanged:
             #If new tiles were added, save the file to disk.
