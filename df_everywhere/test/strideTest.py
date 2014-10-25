@@ -5,14 +5,14 @@ except:
 
 import numpy
 
-tile_x = 2
-tile_y = 2
-image_x = 4
-image_y = 4
+tile_x = 12
+tile_y = 12
+image_x = tile_x * 1
+image_y = tile_y * 1
 
-#a = numpy.random.rand(image_x,image_y,3) * 255
-#a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
-#a_img.save('strideTest.png')
+a = numpy.random.rand(image_x,image_y,3) * 255
+a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
+a_img.save('strideTest.png')
 a_img = Image.open('strideTest.png')
 a_array = numpy.array(a_img)
 
@@ -24,7 +24,9 @@ strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
 blocks=numpy.lib.stride_tricks.as_strided(a_array, shape=shape, strides=strides)
 
-print(a_array)
-print('----------------------------------')
-print(blocks)
-print('----------------------------------')
+i=0
+for block in blocks:
+    for lock in block:
+        img = Image.fromarray(lock.astype('uint8')).convert('RGB')
+        img.save('%d.png' % i)
+        i += 1

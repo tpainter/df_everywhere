@@ -281,7 +281,8 @@ class Tileset:
         """
         Parses an image as an array. Returns list of tile positions in map.
         """
-        img_arr = numpy.ascontiguousarray(img)
+        #img_arr = numpy.ascontiguousarray(img)
+        img_arr = numpy.array(img)
         tileMap = []
         addTilesDict = {}
         tileSetChanged = False        
@@ -296,35 +297,34 @@ class Tileset:
         sz = img_arr.itemsize
         h,w = image_x, image_y
         bh,bw = self.tile_y, self.tile_x
-        shape = (h/bh, w/bw, bh, bw)
-
-        strides = sz*numpy.array([w*bh,bw,w,1])
+        shape = numpy.array([h/bh, w/bw, bh, bw, 3])
+        strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
         blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
-        print shape
+        
         row = []
         i = 0
-        for block in blocks:
-            tile_hash = self._imageHash(block)
-            
-            if tile_hash in self.tileDict:
-                row.append(self.tileDict[tile_hash]) 
-            else:
-                row.append(-1)
-                if tile_hash in addTilesDict:
-                    pass
-                else:
-                    addTilesDict[tile_hash] = block
-                    b = block
-                    prettyConsole.console('log', b.shape)
-                    from twisted.internet import reactor
-                    reactor.stop()
-                tileSetChanged = True
+        prettyConsole.console('log', blocks.shape)
+        for bb in blocks:
+            for block in bb:
+                tile_hash = self._imageHash(block)
                 
-            i += 1
-            if i == tiles_x:
-                tileMap.append(row)
-                row = []
+                if tile_hash in self.tileDict:
+                    row.append(self.tileDict[tile_hash])
+                    #prettyConsole.console('log', 'found.')
+                else:
+                    row.append(-1)
+                    if tile_hash in addTilesDict:
+                        pass
+                    else:
+                        addTilesDict[tile_hash] = block
+                    tileSetChanged = True
+                    #prettyConsole.console('log', 'not found. %s' % str(block.shape))
+                    
+                i += 1
+                if i == tiles_x:
+                    tileMap.append(row)
+                    row = []
         
         '''
         for y_start in range(tiles_y):
