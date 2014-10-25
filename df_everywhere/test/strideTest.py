@@ -19,13 +19,8 @@ a_array = numpy.array(a_img)
 sz = a_array.itemsize
 h,w = image_y, image_x
 bh,bw = tile_y, tile_x
-#shape = (h/bh, w/bw, bh, bw)
-#shape = (1, 2, 2, 3) # works for 2x2x3
-shape = numpy.array([1, h/bh * w/bw, h/bh, w/bw, 3])
-#strides = sz*numpy.array([w*bh,bw,w,1])
-#strides = sz*numpy.array([1,6,3,1]) # works for 2x2x3
-#strides = sz*numpy.array([4*w*bh*3, bw*3, w*3, 3, 1])
-strides = sz*numpy.array([0, bw*3, w*3, 3, 1])
+shape = numpy.array([h/bh, w/bw, bh, bw, 3])
+strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
 blocks=numpy.lib.stride_tricks.as_strided(a_array, shape=shape, strides=strides)
 
@@ -33,6 +28,3 @@ print(a_array)
 print('----------------------------------')
 print(blocks)
 print('----------------------------------')
-#print(a_array.shape)
-#print(blocks.shape)
-#print(a_array.strides)
