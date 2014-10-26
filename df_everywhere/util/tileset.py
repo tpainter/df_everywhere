@@ -302,27 +302,29 @@ class Tileset:
 
         blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
         
+        a = blocks.reshape([-1,self.tile_x,self.tile_y,3])
+        
         row = []
         i = 0
-        for b in blocks:
-            for c in b:
-                tile_hash = self._imageHash(c)
-                
-                if tile_hash in self.tileDict:
-                    row.append(self.tileDict[tile_hash])
+        
+        for c in a:
+            tile_hash = self._imageHash(c)
+            
+            if tile_hash in self.tileDict:
+                row.append(self.tileDict[tile_hash])
+            else:
+                row.append(-1)
+                if tile_hash in addTilesDict:
+                    pass
                 else:
-                    row.append(-1)
-                    if tile_hash in addTilesDict:
-                        pass
-                    else:
-                        addTilesDict[tile_hash] = c
-                    tileSetChanged = True
-                    
-                i += 1
-                if i == tiles_x:
-                    tileMap.append(row)
-                    row = []
-                    i = 0        
+                    addTilesDict[tile_hash] = c
+                tileSetChanged = True
+                
+            i += 1
+            if i == tiles_x:
+                tileMap.append(row)
+                row = []
+                i = 0       
                 
         if tileSetChanged:
             #If new tiles were added, save the file to disk.
