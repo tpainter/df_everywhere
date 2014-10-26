@@ -303,11 +303,6 @@ class Tileset:
 
         blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
         
-        #prettyConsole.console('log', img_arr.shape)
-        #prettyConsole.console('log', img_arr.itemsize)
-        #img.save('strideTest.png')
-        #prettyConsole.console('log', blocks.shape)
-        
         row = []
         i = 0
         for b in blocks:
