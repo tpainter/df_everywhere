@@ -297,6 +297,7 @@ class Tileset:
         sz = img_arr.itemsize
         h,w = image_y, image_x
         bh,bw = self.tile_y, self.tile_x
+        #shape = numpy.array([h/bh, w/bw, bh, bw, 3])
         shape = numpy.array([h/bh, w/bw, bh, bw, 3])
         strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
@@ -305,28 +306,29 @@ class Tileset:
         #prettyConsole.console('log', img_arr.shape)
         #prettyConsole.console('log', img_arr.itemsize)
         #img.save('strideTest.png')
+        #prettyConsole.console('log', blocks.shape)
         
         row = []
         i = 0
-        for block in blocks[0]:
-            tile_hash = self._imageHash(block)
-            
-            if tile_hash in self.tileDict:
-                row.append(self.tileDict[tile_hash])
-            else:
-                row.append(-1)
-                if tile_hash in addTilesDict:
-                    pass
-                else:
-                    addTilesDict[tile_hash] = block
-                tileSetChanged = True
+        for b in blocks:
+            for c in b:
+                tile_hash = self._imageHash(c)
                 
-            i += 1
-            if i == tiles_x:
-                tileMap.append(row)
-                row = []
-                i = 0        
-        
+                if tile_hash in self.tileDict:
+                    row.append(self.tileDict[tile_hash])
+                else:
+                    row.append(-1)
+                    if tile_hash in addTilesDict:
+                        pass
+                    else:
+                        addTilesDict[tile_hash] = c
+                    tileSetChanged = True
+                    
+                i += 1
+                if i == tiles_x:
+                    tileMap.append(row)
+                    row = []
+                    i = 0        
                 
         if tileSetChanged:
             #If new tiles were added, save the file to disk.
