@@ -289,65 +289,44 @@ class Tileset:
         image_x, image_y = img.size
         self.screen_x = image_x
         self.screen_y = image_y
-           
+        
         tiles_x = image_x / self.tile_x
         tiles_y = image_y / self.tile_y
         
         # from: http://stackoverflow.com/questions/8070349/using-numpy-stride-tricks-to-get-non-overlapping-array-blocks
         sz = img_arr.itemsize
-        h,w = image_x, image_y
+        h,w = image_y, image_x
         bh,bw = self.tile_y, self.tile_x
         shape = numpy.array([h/bh, w/bw, bh, bw, 3])
         strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
         blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
         
+        #prettyConsole.console('log', img_arr.shape)
+        #prettyConsole.console('log', img_arr.itemsize)
+        #img.save('strideTest.png')
+        
         row = []
         i = 0
-        prettyConsole.console('log', blocks.shape)
-        for bb in blocks:
-            for block in bb:
-                tile_hash = self._imageHash(block)
-                
-                if tile_hash in self.tileDict:
-                    row.append(self.tileDict[tile_hash])
-                    #prettyConsole.console('log', 'found.')
+        for block in blocks[0]:
+            tile_hash = self._imageHash(block)
+            
+            if tile_hash in self.tileDict:
+                row.append(self.tileDict[tile_hash])
+            else:
+                row.append(-1)
+                if tile_hash in addTilesDict:
+                    pass
                 else:
-                    row.append(-1)
-                    if tile_hash in addTilesDict:
-                        pass
-                    else:
-                        addTilesDict[tile_hash] = block
-                    tileSetChanged = True
-                    #prettyConsole.console('log', 'not found. %s' % str(block.shape))
-                    
-                i += 1
-                if i == tiles_x:
-                    tileMap.append(row)
-                    row = []
+                    addTilesDict[tile_hash] = block
+                tileSetChanged = True
+                
+            i += 1
+            if i == tiles_x:
+                tileMap.append(row)
+                row = []
+                i = 0        
         
-        '''
-        for y_start in range(tiles_y):
-            row  = []
-            for x_start in range(tiles_x):
-                tile_arr = img_arr[y_start * self.tile_y: y_start * self.tile_y + self.tile_y, x_start * self.tile_x: x_start * self.tile_x + self.tile_x]      
-                
-                #Use the hash of the tile as a key to ensure that it is unique
-                tile_hash = self._imageHash(tile_arr)
-                
-                if tile_hash in self.tileDict:
-                    row.append(self.tileDict[tile_hash]) 
-                else:
-                    row.append(-1)
-                    if tile_hash in addTilesDict:
-                        pass
-                    else:
-                        addTilesDict[tile_hash] = tile_arr
-                    #self._addTileToSet(tile_arr, array = True)
-                    tileSetChanged = True
-                        
-            tileMap.append(row)
-        '''
                 
         if tileSetChanged:
             #If new tiles were added, save the file to disk.

@@ -10,11 +10,12 @@ tile_y = 12
 image_x = tile_x * 1
 image_y = tile_y * 1
 
-a = numpy.random.rand(image_x,image_y,3) * 255
-a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
-a_img.save('strideTest.png')
+#a = numpy.random.rand(image_x,image_y,3) * 255
+#a_img = Image.fromarray(a.astype('uint8')).convert('RGB')
+#a_img.save('strideTest.png')
 a_img = Image.open('strideTest.png')
 a_array = numpy.array(a_img)
+image_x, image_y = a_img.size
 
 sz = a_array.itemsize
 h,w = image_y, image_x
@@ -27,6 +28,7 @@ blocks=numpy.lib.stride_tricks.as_strided(a_array, shape=shape, strides=strides)
 i=0
 for block in blocks:
     for lock in block:
-        img = Image.fromarray(lock.astype('uint8')).convert('RGB')
-        img.save('%d.png' % i)
+        if i < 32:
+            img = Image.fromarray(lock.astype('uint8')).convert('RGB')
+            img.save('%d.png' % i)
         i += 1
