@@ -297,7 +297,6 @@ class Tileset:
         sz = img_arr.itemsize
         h,w = image_y, image_x
         bh,bw = self.tile_y, self.tile_x
-        #shape = numpy.array([h/bh, w/bw, bh, bw, 3])
         shape = numpy.array([h/bh, w/bw, bh, bw, 3])
         strides = sz*numpy.array([w*bh*3,bw*3,w*3,3,1])
 
