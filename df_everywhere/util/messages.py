@@ -27,6 +27,7 @@ def welcome():
     print("DF Everywhere - Play Dwarf Fortress from your browser.\n"
           "www.dfeverywhere.com\n"
           "\n"
+          "Version:0.1.4\n"
           "For questions, check the topic on the official Dwarf fortress Forums or email:\n"
           "   www.bay12forums.com/smf/index.php?topic=139975.0\n"
           "   dwarfeverywhere@gmail.com\n")
