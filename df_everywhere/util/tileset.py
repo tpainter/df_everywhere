@@ -24,7 +24,7 @@ except:
 
 import sys
 from cStringIO import StringIO
-import mmh3
+#import mmh3
 import numpy
 
 import prettyConsole
@@ -346,10 +346,10 @@ class Tileset:
         Returns a hash of the image.
         """        
         #Hash is fast
-        #return hash(img.tostring())
+        return hash(img.tostring())
         
         #murmur3 is fastest but not a lot faster than Hash
-        return mmh3.hash(img.tostring())
+        #return mmh3.hash(img.tostring())
         
     def wampSend(self):
         """
