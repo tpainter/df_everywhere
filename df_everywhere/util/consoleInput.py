@@ -7,18 +7,24 @@ from twisted.internet import reactor
 
 class ConsoleInput(object):
 
-    def __init__(self, stopFunction):
+    def __init__(self, stopFunction, reconnectFunction):
         self.stopFunction = stopFunction
+        self.reconnectFunction = reconnectFunction
     
     def start(self):
         self.terminator = 'q'
+        self.restart = 'r'
         self.getKey = _Getch()
         self.startReceiving()
     def startReceiving(self, s = ''):
-        if s != self.terminator:
+        if s == self.terminator:
+            self.stopFunction()
+        elif s == self.restart:
+            self.reconnectFunction()
             _deferToThread(self.getKey).addCallback(self.startReceiving)
         else:
-            self.stopFunction()
+            _deferToThread(self.getKey).addCallback(self.startReceiving)
+                
 
 
 class _Getch:

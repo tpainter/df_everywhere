@@ -42,28 +42,31 @@ class Game():
         
         ### Timing delays
         self.screenDelay = 0.0
+        self.screenDelaySlowed = 0.5
         self.filenameDelay = 5
         self.sizeDelay = 5
         self.heartbeatDelay = 1
         self.screenCycles = 0
         
         ### WAMP details
-        self.topicPrefix = "df_everywhere.%s" % web_topic
+        self.web_topic = web_topic
+        self.web_key = web_key
+        self.topicPrefix = "df_everywhere.%s" % self.web_topic
         self.connected = False
         self.connection = None
+        self.defereds = {}
         self.subscriptions = {}
-        self.rpcs = []
+        self.rpcs = {}
         
         ### Heartbeats
         self.heartbeatCounter = 120
         self.slowed = False
         
         ### Connect to WAMP router
-        self.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", web_topic, web_key)
+        self.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", self.web_topic, self.web_key)
         
         ### Wait for WAMP connection before initializing loops in reactor
-        reactor.callLater(0, self._waitForConnection)
-        
+        reactor.callLater(0, self._waitForConnection)        
             
     def _waitForConnection(self):
         """
@@ -102,7 +105,7 @@ class Game():
         Registers function for remote procedure calls.
         """
         d = yield self.connection[0].register(self.tileset.wampSend, '%s.tilesetimage' % self.topicPrefix)
-        self.rpcs.append(d)
+        self.rpcs['tileset'] = d
     
     @inlineCallbacks
     def _subscribeCommands(self):
@@ -144,7 +147,7 @@ class Game():
         else:
             self.slowed = False            
         
-        reactor.callLater(self.heartbeatDelay, self._loopHeartbeat)
+        self.defereds['heartbeat'] = reactor.callLater(self.heartbeatDelay, self._loopHeartbeat)
         
     #@inlineCallbacks
     def _loopScreen(self):
@@ -182,7 +185,10 @@ class Game():
         if self.fps:
             self.fps_counter += 1
         
-        reactor.callLater(self.screenDelay, self._loopScreen)
+        if self.slowed:
+            self.defereds['screen'] = reactor.callLater(self.screenDelaySlowed, self._loopScreen)
+        else:
+            self.defereds['screen'] = reactor.callLater(self.screenDelay, self._loopScreen)
         
     def _loopFilename(self):
         """
@@ -190,9 +196,13 @@ class Game():
         """
         if self.connected:
             if self.tileset.filename is not None:
-                self.connection[0].publish("%s.tileset" % self.topicPrefix, self.tileset.filename)
-        
-        reactor.callLater(self.filenameDelay, self._loopFilename)
+                try:
+                    self.connection[0].publish("%s.tileset" % self.topicPrefix, self.tileset.filename)
+                except:
+                    #connection lost, reconnect
+                    self.reconnect()
+                    
+        self.defereds['filename'] = reactor.callLater(self.filenameDelay, self._loopFilename)
         
     def _loopTileSize(self):
         """
@@ -200,9 +210,12 @@ class Game():
         """
         if self.connected:
             if (self.tileset.tile_x is not None) and (self.tileset.tile_y is not None):
-                self.connection[0].publish("%s.tilesize" % self.topicPrefix, [self.tileset.tile_x, self.tileset.tile_y])
-                
-        reactor.callLater(self.sizeDelay, self._loopTileSize)
+                try:
+                    self.connection[0].publish("%s.tilesize" % self.topicPrefix, [self.tileset.tile_x, self.tileset.tile_y])
+                except:
+                    #connection lost, reconnect
+                    self.reconnect()
+        self.defereds['tileSize'] = reactor.callLater(self.sizeDelay, self._loopTileSize)
         
     def _loopScreenSize(self):
         """
@@ -212,9 +225,12 @@ class Game():
             if (self.tileset.screen_x is not None) and (self.tileset.screen_y is not None):
                 #Only send screen size update if it makes sense
                 if (self.tileset.screen_x % self.tileset.tile_x == 0) and (self.tileset.screen_y % self.tileset.tile_y == 0):
-                    self.connection[0].publish("%s.screensize" % self.topicPrefix, [self.tileset.screen_x, self.tileset.screen_y])
-        
-        reactor.callLater(self.sizeDelay, self._loopScreenSize)
+                    try:
+                        self.connection[0].publish("%s.screensize" % self.topicPrefix, [self.tileset.screen_x, self.tileset.screen_y])
+                    except:
+                        #connection lost, reconnect
+                        self.reconnect()
+        self.defereds['screenSize'] = reactor.callLater(self.sizeDelay, self._loopScreenSize)
         
     def _sendTileMap(self, tilemap):
         """
@@ -222,7 +238,11 @@ class Game():
         """
         if self.connected:
             if tilemap != []:
-                self.connection[0].publish("%s.map" % self.topicPrefix, tilemap)
+                try:
+                    self.connection[0].publish("%s.map" % self.topicPrefix, tilemap)
+                except:
+                    #connection lost, reconnect
+                    self.reconnect()
                 
     def _loopPrintFps(self):
         """
@@ -232,13 +252,54 @@ class Game():
         self.fps_counter = 0
         
         if self.fps:
-            reactor.callLater(5, self._loopPrintFps)
+            self.defereds['fps'] = reactor.callLater(5, self._loopPrintFps)
             
     def stopClean(self):
         """
         Cleanly stop connection and shutdown.
         """
+        #Cancel pending callbacks
+        for k, v in self.defereds.iteritems():
+            v.cancel()
         self.connected = False
-        self.connection[0].disconnect()
-        reactor.callLater(2, reactor.stop)
+        try:
+            self.connection[0].disconnect()
+        except:
+            pass
+        reactor.callLater(1, reactor.stop)
+        
+    def reconnect(self):
+        """
+        Handles reconnecting to WAMP server.
+        """
+        prettyConsole.console('log', "Reconnecting to server...")
+        
+        #Cancel pending callbacks
+        for k, v in self.defereds.iteritems():
+            v.cancel()
+        self.defereds.clear()
+        
+        #Try to cancel RPC and subscriptions
+        for text, sub in self.subscriptions.iteritems():
+            try:
+                sub.unsubscribe()
+            except:
+                prettyConsole.console('log', "Unable to unsubscribe to: %s" % text)
+                
+        for text, rpc in self.rpcs.iteritems():
+            try:
+                rpc.unregister()
+            except:
+                prettyConsole.console('log', "Unable to unsubscribe to: %s" % text)
+        
+        #Reset back to original state
+        self.connected = False
+        self.connection = None
+        self.subscriptions.clear()
+        self.rpcs.clear()
+        
+        #Restart connection
+        self.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", self.web_topic, self.web_key)
+        
+        reactor.callLater(0, self._waitForConnection)
         

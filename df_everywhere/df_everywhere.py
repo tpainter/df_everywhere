@@ -105,7 +105,6 @@ if __name__ == "__main__":
         i = 0
         while True:
             i+= 1
-            time.sleep(2)
             shot = utils.screenshot(window_handle[0], debug = False)
             trimmedShot = utils.trim(shot, debug = False)
             if trimmedShot is not None:
@@ -116,6 +115,8 @@ if __name__ == "__main__":
             if i > 30:
                 #End program after about 60 seconds
                 sys.exit(0)
+                
+            time.sleep(2)
     
     
     local_file = utils.findLocalImg(tile_x, tile_y)
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     client_control.tileset = tset
     
     #Start input handler
-    inputHandler = consoleInput.ConsoleInput(client_control.stopClean)
+    inputHandler = consoleInput.ConsoleInput(client_control.stopClean, client_control.reconnect)
     reactor.callWhenRunning(inputHandler.start)
     
     reactor.run()
