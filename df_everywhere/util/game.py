@@ -276,7 +276,8 @@ class Game():
         
         #Cancel pending callbacks
         for k, v in self.defereds.iteritems():
-            v.cancel()
+            if v.active():
+                v.cancel()
         self.defereds.clear()
         
         #Try to cancel RPC and subscriptions
