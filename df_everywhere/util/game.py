@@ -57,6 +57,8 @@ class Game():
         self.defereds = {}
         self.subscriptions = {}
         self.rpcs = {}
+        self.retryWaits = 0 #number of cycles program has waited for connection
+        self.reconnecting = False
         
         ### Heartbeats
         self.heartbeatCounter = 120
@@ -75,20 +77,39 @@ class Game():
         if self.connection is None:
             prettyConsole.console('log', "Waiting for connection...")
             #Wait and test again
+            self.retryWaits += 1
+            if self.retryWaits > 20:
+                #wait about 20seconds for connection. Then try reconnecting
+                self.retryWaits = 0
+                self.reconnecting = False
+                prettyConsole.console('log', "aaaaaa")
+                reactor.callLater(1, self.reconnect)
+                return
+                
             reactor.callLater(0.5, self._waitForConnection)
         else:
             try:
                 a = self.connection[0]
             except:
                 prettyConsole.console('log', "Still waiting for connection...")
-                #Wait and test again
+                ##Wait and test again
+                self.retryWaits += 1
+                if self.retryWaits > 20:
+                    #wait about 20seconds for connection. Then try reconnecting
+                    self.retryWaits = 0
+                    self.reconnecting = False
+                    prettyConsole.console('log', "bbbb")
+                    reactor.callLater(1, self.reconnect)
+                    return
+                    
                 reactor.callLater(0.5, self._waitForConnection)
             else:
                 prettyConsole.console('log', "Connected...")
                 self.connected = True
-                reactor.callLater(0, self._registerRPC)
-                reactor.callLater(0, self._subscribeCommands)
-                reactor.callLater(0, self._subscribeHeartbeats)
+                self.reconnecting = False
+                reactor.callLater(0.1, self._registerRPC)
+                reactor.callLater(0.2, self._subscribeCommands)
+                reactor.callLater(0.3, self._subscribeHeartbeats)
                 
                 ### Initialize reactor loops
                 reactor.callLater(self.screenDelay, self._loopScreen)
@@ -104,8 +125,12 @@ class Game():
         """
         Registers function for remote procedure calls.
         """
-        d = yield self.connection[0].register(self.tileset.wampSend, '%s.tilesetimage' % self.topicPrefix)
-        self.rpcs['tileset'] = d
+        try:
+            d = yield self.connection[0].register(self.tileset.wampSend, '%s.tilesetimage' % self.topicPrefix)
+            self.rpcs['tileset'] = d
+        except Exception as inst:
+            prettyConsole.console('log', inst)
+            reactor.callLater(1, self.reconnect)
     
     @inlineCallbacks
     def _subscribeCommands(self):
@@ -242,7 +267,7 @@ class Game():
                     self.connection[0].publish("%s.map" % self.topicPrefix, tilemap)
                 except:
                     #connection lost, reconnect
-                    self.reconnect()
+                    reactor.callLater(1, self.reconnect)
                 
     def _loopPrintFps(self):
         """
@@ -272,6 +297,12 @@ class Game():
         """
         Handles reconnecting to WAMP server.
         """
+        if self.reconnecting:
+            #don't try to reconnect if it has already been tried
+            prettyConsole.console('log', "skip")
+            return
+        
+        self.reconnecting = True
         prettyConsole.console('log', "Reconnecting to server...")
         
         #Cancel pending callbacks
