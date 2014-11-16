@@ -59,6 +59,7 @@ class Game():
         self.rpcs = {}
         self.retryWaits = 0 #number of cycles program has waited for connection
         self.reconnecting = False
+        self.sendFullMaps = True #whether or not to always send full maps
         
         ### Heartbeats
         self.heartbeatCounter = 120
@@ -193,7 +194,7 @@ class Game():
             
             #Only send a full tile map every 20 cycles, otherwise just send changes
             #This is slower with deferToThread
-            if (self.screenCycles) % 20 == 0:
+            if self.sendFullMaps or (self.screenCycles) % 20 == 0:
                 tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)
                 #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = True)
             else:
