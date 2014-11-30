@@ -58,6 +58,7 @@ class Game():
         self.subscriptions = {}
         self.rpcs = {}
         self.retryWaits = 0 #number of cycles program has waited for connection
+        self.retryAttempts = 0 #number of retry attempts. Used to increase wait time. 
         self.reconnecting = False
         self.sendFullMaps = True #whether or not to always send full maps
         
@@ -80,11 +81,12 @@ class Game():
             #Wait and test again
             self.retryWaits += 1
             if self.retryWaits > 20:
-                #wait about 20seconds for connection. Then try reconnecting
+                #wait about 10 seconds for connection. Then try reconnecting
                 self.retryWaits = 0
                 self.reconnecting = False
-                prettyConsole.console('log', "aaaaaa")
-                reactor.callLater(1, self.reconnect)
+                #prettyConsole.console('log', "aaaaaa")
+                prettyConsole.console('log', 'Will attempt reconnect in %d seconds.' % (1 + 2 ** self.retryAttempts))
+                reactor.callLater(1 + 2 ** self.retryAttempts, self.reconnect)
                 return
                 
             reactor.callLater(0.5, self._waitForConnection)
@@ -99,8 +101,9 @@ class Game():
                     #wait about 20seconds for connection. Then try reconnecting
                     self.retryWaits = 0
                     self.reconnecting = False
-                    prettyConsole.console('log', "bbbb")
-                    reactor.callLater(1, self.reconnect)
+                    #prettyConsole.console('log', "bbbb")
+                    prettyConsole.console('log', 'Will attempt reconnect in %d seconds.' % (1 + 2 ** self.retryAttempts))
+                    reactor.callLater(1 + 2 ** self.retryAttempts, self.reconnect)
                     return
                     
                 reactor.callLater(0.5, self._waitForConnection)
@@ -108,6 +111,8 @@ class Game():
                 prettyConsole.console('log', "Connected...")
                 self.connected = True
                 self.reconnecting = False
+                self.retryWaits = 0
+                self.retryAttempts = 0
                 reactor.callLater(0.1, self._registerRPC)
                 reactor.callLater(0.2, self._subscribeCommands)
                 reactor.callLater(0.3, self._subscribeHeartbeats)
@@ -304,6 +309,7 @@ class Game():
             return
         
         self.reconnecting = True
+        self.retryAttempts += 1
         prettyConsole.console('log', "Reconnecting to server...")
         
         #Cancel pending callbacks
@@ -334,5 +340,5 @@ class Game():
         #Restart connection
         self.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", self.web_topic, self.web_key)
         
-        reactor.callLater(0, self._waitForConnection)
+        reactor.callLater(0.5, self._waitForConnection)
         
