@@ -96,9 +96,12 @@ if __name__ == "__main__":
         raw_input('DF Everywhere stopped. Press [enter] to close this window.')
         sys.exit()
     
-    
-    trimmedShot = utils.trim(shot, debug = False)
-    tile_x, tile_y = utils.findTileSize(trimmedShot)
+    try:
+        trimmedShot = utils.trim(shot, debug = False)
+        tile_x, tile_y = utils.findTileSize(trimmedShot)
+    except:
+        print("Error getting screenshot. Exiting.")
+        sys.exit()
     
     #loop through finding a tile size until it is successful
     if (tile_x == 0) or (tile_y == 0):

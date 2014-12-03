@@ -191,7 +191,9 @@ class Game():
             shot_x, shot_y = shot.size
         except:
             print("Error getting image. Exiting.")
-            reactor.stop()
+            #reactor.stop()
+            self.stopClean()
+            return
         
         trimmedShot = utils.trim(shot, debug = False) 
         
@@ -291,7 +293,8 @@ class Game():
         """
         #Cancel pending callbacks
         for k, v in self.defereds.iteritems():
-            v.cancel()
+            if v.active():
+                v.cancel()
         self.connected = False
         try:
             self.connection[0].disconnect()
