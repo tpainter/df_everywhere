@@ -17,6 +17,7 @@
 
 from twisted.internet import reactor
 from twisted.internet.endpoints import clientFromString
+from twisted.internet.protocol import ReconnectingClientFactory
 
 from autobahn.twisted.wamp import ApplicationSessionFactory
 from autobahn.twisted.wamp import ApplicationSession
@@ -56,6 +57,9 @@ class SubpubTileset(ApplicationSession):
             self.factory._myConnection.remove(self)
         self.disconnect()
         
+class MyClientFactory(WampWebSocketClientFactory, ReconnectingClientFactory):
+    pass
+        
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """
@@ -94,7 +98,7 @@ def wampClient(wampAddress, wampClientEndpoint, topic, key):
     
     ## create a WAMP-over-WebSocket transport client factory    
     #transport_factory = WampWebSocketClientFactory(session_factory, wampAddress, debug = False)
-    transport_factory = WampWebSocketClientFactory(session_factory, wampAddress, debug = False, debug_wamp = False)
+    transport_factory = MyClientFactory(session_factory, wampAddress, debug = False, debug_wamp = False)
     transport_factory.setProtocolOptions(failByDrop = False)
     
     ## start a WebSocket client from an endpoint
