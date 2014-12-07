@@ -336,12 +336,18 @@ class Game():
         
         #Reset back to original state
         self.connected = False
+        try:
+            self.connection[0].leave()
+        except:
+            prettyConsole.console('log', "Unable to cleanly close connection.")
+            pass
         self.connection = None
         self.subscriptions.clear()
         self.rpcs.clear()
         
         #Restart connection
         self.connection = wamp_local.wampClient("ws://router1.dfeverywhere.com:7081/ws", "tcp:router1.dfeverywhere.com:7081", self.web_topic, self.web_key)
+        #self.connection[0].connect()
         
         reactor.callLater(0.5, self._waitForConnection)
         
