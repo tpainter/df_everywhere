@@ -28,7 +28,7 @@ from ctypes import windll
 import os
     
 
-def get_windows_bytitle(title_text, exact = False):    
+def win_get_windows_bytitle(title_text, exact = False):    
     """
     Gets details of window position by title text. [Windows Only]
     """   
@@ -43,7 +43,7 @@ def get_windows_bytitle(title_text, exact = False):
     else:
         return [hwnd for hwnd, title in windows if title_text in title]
         
-def screenshot(hwnd = None, debug = False):
+def win_screenshot(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
     """    
@@ -93,7 +93,7 @@ def screenshot(hwnd = None, debug = False):
       
     
         
-def screenshot_old(hwnd = None, debug = False):
+def win_screenshot_old(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
     """

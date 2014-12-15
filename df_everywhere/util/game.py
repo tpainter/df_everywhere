@@ -28,7 +28,7 @@ class Game():
     Object to hold all program states and connections.
     """
     
-    def __init__(self, web_topic, web_key, window_hnd, fps = False):
+    def __init__(self, web_topic, web_key, shotFunction, window_hnd, fps = False):
         ### FPS reports
         self.fps = fps
         self.fps_counter = 0
@@ -37,6 +37,7 @@ class Game():
         self.tileset = None
         
         ### Commands
+        self.shotFunction = shotFunction
         self.window_hnd = window_hnd
         self.controlWindow = sendInput.SendInput(self.window_hnd)
         
@@ -186,7 +187,7 @@ class Game():
         Handles periodically running screen grabs.
         """
         try:
-            shot = utils.screenshot(self.window_hnd, debug = False)
+            shot = self.shotFunction(self.window_hnd, debug = False)
             #Need to check that an image was returned.
             shot_x, shot_y = shot.size
         except:
@@ -200,6 +201,7 @@ class Game():
         if trimmedShot is not None:
             
             #Only send a full tile map every 20 cycles, otherwise just send changes
+            #Is this needed anymore? Javascript expects full maps all the time.
             #This is slower with deferToThread
             if self.sendFullMaps or (self.screenCycles) % 20 == 0:
                 tileMap = self.tileset.parseImageArray(trimmedShot, returnFullMap = True)

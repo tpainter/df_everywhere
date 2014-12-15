@@ -84,9 +84,10 @@ if __name__ == "__main__":
         sys.exit()
     elif _platform == "win32":
         # Windows..
-        window_handle = utils.get_windows_bytitle("Dwarf Fortress")            
+        window_handle = utils.win_get_windows_bytitle("Dwarf Fortress")            
         try:
-            shot = utils.screenshot(window_handle[0], debug = False)
+            shot = utils.win_screenshot(window_handle[0], debug = False)
+            shotFunct = utils.win_screenshot
         except:
             print("Unable to find Dwarf Fortress window. Ensure that it is running.")
             raw_input('DF Everywhere stopped. Press [enter] to close this window.')
@@ -108,7 +109,7 @@ if __name__ == "__main__":
         i = 0
         while True:
             i+= 1
-            shot = utils.screenshot(window_handle[0], debug = False)
+            shot = shotFunct(window_handle[0], debug = False)
             trimmedShot = utils.trim(shot, debug = False)
             if trimmedShot is not None:
                 tile_x, tile_y = utils.findTileSize(trimmedShot)
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     #Start WAMP client
-    client_control = game.Game(web_topic, web_key, window_handle[0], fps = show_fps)    
+    client_control = game.Game(web_topic, web_key, shotFunct, window_handle[0], fps = show_fps)    
     client_control.tileset = tset
     
     #Start input handler
