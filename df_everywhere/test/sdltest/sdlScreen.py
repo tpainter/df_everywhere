@@ -28,13 +28,15 @@ def get_windows_bytitle(title_text, exact = False):
 
 sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO) 
 
-window_handle = get_windows_bytitle("Dwarf Fortress", True) 
-#window_handle = get_windows_bytitle("Untitled", False) 
+#window_handle = get_windows_bytitle("Dwarf Fortress", True) 
+window_handle = get_windows_bytitle("Untitled", False)
 
 df_window = sdl2.SDL_CreateWindowFrom(window_handle[0])
 df_sur = sdl2.SDL_GetWindowSurface(df_window)
 save_sur = sdl2.SDL_CreateRGBSurface(0,df_sur[0].w,df_sur[0].h,32,0,0,0,0)
-result = sdl2.SDL_SaveBMP(save_sur,'test.bmp')
+#result = sdl2.SDL_SaveBMP(save_sur,'test.bmp')
+result = sdl2.SDL_SaveBMP(df_sur,'test.bmp')
+print result
 sdl2.SDL_FreeSurface(df_sur)
 print(sdl2.SDL_GetError()) 
 
