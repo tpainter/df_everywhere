@@ -22,9 +22,6 @@ except:
     from PIL import Image
     from PIL import ImageChops
 
-import win32gui
-import win32ui
-from ctypes import windll
 import os
     
 
@@ -33,6 +30,7 @@ def win_get_windows_bytitle(title_text, exact = False):
     Gets details of window position by title text. [Windows Only]
     """   
     
+    import win32gui
     
     def _window_callback(hwnd, all_windows):
         all_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -46,7 +44,11 @@ def win_get_windows_bytitle(title_text, exact = False):
 def win_screenshot(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
-    """    
+    """   
+    
+    import win32gui
+    import win32ui
+    from ctypes import windll
      
     if not hwnd:
         print("Unable to get window. Exiting.")
@@ -88,9 +90,7 @@ def win_screenshot(hwnd = None, debug = False):
     if result == 1:
         #PrintWindow Succeeded
         #img.save("test.png")
-        return img
-    
-      
+        return img      
     
         
 def win_screenshot_old(hwnd = None, debug = False):
@@ -101,6 +101,7 @@ def win_screenshot_old(hwnd = None, debug = False):
     # from: https://stackoverflow.com/questions/3260559/how-to-get-a-window-or-fullscreen-screenshot-in-python-3k-without-pil
     
     import win32con
+    import win32gui
         
     if not hwnd:
         print("Unable to get window. Exiting.")
@@ -139,6 +140,57 @@ def win_screenshot_old(hwnd = None, debug = False):
         #webbrowser.open(filename)
     
     return img
+    
+def linux_get_windows_bytitle(title_text, exact = False):
+    """
+    Finds a linux (Gtk) window by title. Returns window.
+    """
+    
+    import gtk, wnck
+ 
+    default = wnck.screen_get_default()
+
+    while gtk.events_pending():
+        gtk.main_iteration(False)
+
+    window_list = default.get_windows()
+
+    if len(window_list) == 0:
+        print "No Windows Found"
+    for win in window_list:
+        if exact:
+            if win.get_name() == title_text:
+                return win
+        else:
+            if title_text in win.get_name():
+                return win
+    
+def linux_screenshot(wnck_win = None, debug = False):
+    """
+    Takes a screenshot of the given window on linux using Gtk.
+    """
+    
+    import gtk, wnck
+    import gtk.gdk
+    import time
+    
+    root_win = gtk.gdk.get_default_root_window()
+    w = wnck_win
+    w.activate(int(time.time()))
+    #Should not need to sleep, but works for now.
+    time.sleep(1)
+
+    pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,w.get_client_window_geometry()[2], w.get_client_window_geometry()[3])
+    pb = pb.get_from_drawable(root_win,root_win.get_colormap(),w.get_client_window_geometry()[0],w.get_client_window_geometry()[1],0,0,w.get_client_window_geometry()[2],w.get_client_window_geometry()[3])
+    if (pb != None):
+        if debug:
+            pb.save("screenshot_gtk.png","png")
+            print "Screenshot saved to screenshot_gtk.png."
+        
+        width, height = pb.get_width(),pb.get_height()
+        return Image.fromstring("RGB",(width,height),pb.get_pixels() )
+    else:
+        print "Unable to get the screenshot."
     
 def findLocalImg(x, y):
     """

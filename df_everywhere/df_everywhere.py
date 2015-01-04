@@ -75,15 +75,21 @@ if __name__ == "__main__":
             
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
-        print("Linux unsupported at this time. Exiting...")
-        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
-        sys.exit()
+        #linux...
+        window = utils.linux_get_windows_bytitle("Dwarf fortress")
+        try:
+            shot = utils.linux_screenshot(window_handle, debug = False)
+            shotFunct = utils.linux_screenshot
+        except:
+            print("Unable to find Dwarf Fortress window. Ensure that it is running.")
+            raw_input('DF Everywhere stopped. Press [enter] to close this window.')
+            sys.exit()
     elif _platform == "darwin":
         print("OS X unsupported at this time. Exiting...")
         raw_input('DF Everywhere stopped. Press [enter] to close this window.')
         sys.exit()
     elif _platform == "win32":
-        # Windows..
+        # Windows...
         window_handle = utils.win_get_windows_bytitle("Dwarf Fortress")            
         try:
             shot = utils.win_screenshot(window_handle[0], debug = False)
