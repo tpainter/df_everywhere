@@ -307,11 +307,14 @@ class Game():
     def reconnect(self):
         """
         Handles reconnecting to WAMP server.
-        """
+        """       
+        
+        
         if self.reconnecting:
             #don't try to reconnect if it has already been tried
             prettyConsole.console('log', "skip")
             return
+            
         
         self.reconnecting = True
         self.retryAttempts += 1
