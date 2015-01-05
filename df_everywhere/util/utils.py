@@ -178,7 +178,13 @@ def linux_screenshot(wnck_win = None, debug = False):
     w = wnck_win
     w.activate(int(time.time()))
     #Should not need to sleep, but works for now.
-    time.sleep(1)
+    #time.sleep(1)
+    #Maybe just needs a flush()?
+    
+    #Check to see if a window is above the target window
+    if w.is_below():
+        #If it is, don't bother taking a screen shot.
+        return None
 
     pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,w.get_client_window_geometry()[2], w.get_client_window_geometry()[3])
     pb = pb.get_from_drawable(root_win,root_win.get_colormap(),w.get_client_window_geometry()[0],w.get_client_window_geometry()[1],0,0,w.get_client_window_geometry()[2],w.get_client_window_geometry()[3])
