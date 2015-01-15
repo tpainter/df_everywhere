@@ -19,8 +19,7 @@
 # Converts submitted command string to a key command to "type" into a window
 #
 #
-import win32gui
-import SendKeys
+
 
 class SendInput:
     """
@@ -28,8 +27,25 @@ class SendInput:
     """
     
     def __init__(self, hwnd):
+        
         #The window that commands are sent to
         self.hwnd = hwnd
+        
+        #Detect whether program is on Windows or Linux
+        from sys import platform as _platform
+        if _platform == "linux" or _platform == "linux2":
+            #linux...
+            from pykeyboard import PyKeyboard
+            self._sendCommand = self._sendCommandLinux
+            self.k = PyKeyboard()
+        elif _platform == "win32":
+            # Windows...
+            import win32gui
+            import SendKeys
+            self._sendCommand = self._sendCommandWindows
+        else:
+            raw_input("Input platform unsupported or unknown: %s" % _platform)
+            sys.exit()
         
         #Codes to use with SendKeys
         self._command = { 'a': 'a',
@@ -145,12 +161,19 @@ class SendInput:
         #return command from dictionary. If it doesn't exist, return 'None'
         return self._command.get(dirtyCommand, None)
     
-    def _sendCommand(self, com):
+    def _sendCommandWindows(self, com):
         #This makes the window active and sends keyboard events directly.
         #Windows only.
         #print("Got: %s" % com)
         result = win32gui.SetForegroundWindow(self.hwnd)
-        SendKeys.SendKeys(com)        
+        SendKeys.SendKeys(com)   
+
+    def _sendCommandLinux(self, com):
+        #This makes the window active and sends keyboard events directly.
+        #This is for linux only, but may work for Windows also.
+        #print("Got: %s" % com)
+        self.hwnd.activate(int(time.time()))
+        self.k.tap_key(com)      
         
     def receiveCommand(self, dirtyCommand):
         """
