@@ -25,8 +25,9 @@ import sys
 
 from util import getTerminalSize
 
-#This is a global.
+#These are globals.
 _lastUpdate = ''
+_systemText = sys.platform
 
 sizex, sizey = getTerminalSize.getTerminalSize()
 _consoleWidth = sizex
@@ -51,7 +52,11 @@ def _log(text):
     global _consoleWidth
     
     outputString = text
-    sys.stdout.write("{0:<{1}}\n".format(text, _consoleWidth - 1))
+    #This is needed because the apparent console size is different on windows and linux
+    if _systemText == 'win32':
+        sys.stdout.write("{0:<{1}}\n".format(text, _consoleWidth - 1))
+    elif _systemText == "linux" or _systemText == "linux2":
+        sys.stdout.write("{0:<{1}}".format(text, _consoleWidth))
     _update(_lastUpdate)
     
 def _update(text):
@@ -63,5 +68,12 @@ def _update(text):
     global _consoleWidth
     
     _lastUpdate = text
-    sys.stdout.write("{0:<{1}}\r".format("Press [q] to exit. "+ text, _consoleWidth - 1))
+    #This is needed because the apparent console size is different on windows and linux
+    if _systemText == 'win32':
+        sys.stdout.write("{0:<{1}}\r".format("Press [q] to exit. "+ text, _consoleWidth - 1))
+    elif _systemText == "linux" or _systemText == "linux2":
+        sys.stdout.write("{0:<{1}}\r".format("Press [q] to exit. "+ text, _consoleWidth))
+    
+    #Make sure that text is displayed...
+    sys.stdout.flush()
     

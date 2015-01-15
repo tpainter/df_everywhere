@@ -20,6 +20,7 @@ if __name__ == "__main__":
     """
     When run directly, it finds Dwarf Fortress window
     """
+    import os.path
     import sys
     from sys import platform as _platform
     import time
@@ -43,8 +44,7 @@ if __name__ == "__main__":
     
     messages.welcome()
     
-    #If 'localTest' file is present, use separate configuration
-    import os.path
+    #If 'localTest' file is present, use separate configuration    
     localTest = os.path.isfile('localTest')
     if localTest:
         print("localTest file found. Proceeding appropriately.")
@@ -52,9 +52,9 @@ if __name__ == "__main__":
     Config = ConfigParser.ConfigParser()
     try:
         if localTest:
-            Config.read(".\localTest")
+            Config.read("localTest")
         else:
-            Config.read(".\dfeverywhere.conf")
+            Config.read("dfeverywhere.conf")
         web_topic = Config.get('dfeverywhere', 'TOPIC')
         web_key = Config.get('dfeverywhere', 'KEY')
         try:
@@ -76,9 +76,10 @@ if __name__ == "__main__":
     #Change screenshot method based on operating system    
     if _platform == "linux" or _platform == "linux2":
         #linux...
-        window = utils.linux_get_windows_bytitle("Dwarf fortress")
+        window_handle = []
+        window_handle.append(utils.linux_get_windows_bytitle("Dwarf Fortress"))
         try:
-            shot = utils.linux_screenshot(window_handle, debug = False)
+            shot = utils.linux_screenshot(window_handle[0], debug = False)
             shotFunct = utils.linux_screenshot
         except:
             print("Unable to find Dwarf Fortress window. Ensure that it is running.")
