@@ -58,8 +58,20 @@ class SubpubTileset(ApplicationSession):
         self.disconnect()
         
 class MyClientFactory(WampWebSocketClientFactory, ReconnectingClientFactory):
-    pass
+    #from: https://gist.github.com/DenJohX/e6d0864738da10cb9685
+    def clientConnectionFailed(self, connector, reason):
+        print "*************************************"
+        print "Connection Failed"
+        print "reason:", reason
+        print "*************************************"
+        ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
         
+    def clientConnectionLost(self, connector, reason):
+        print "*************************************"
+        print "Connection Lost"
+        print "reason:", reason
+        print "*************************************"
+        ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
 def wampServ(wampAddress, wampPort, wampDebug = False):
     """
