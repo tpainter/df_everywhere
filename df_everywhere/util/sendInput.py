@@ -31,22 +31,6 @@ class SendInput:
         #The window that commands are sent to
         self.hwnd = hwnd
         
-        #Detect whether program is on Windows or Linux
-        from sys import platform as _platform
-        if _platform == "linux" or _platform == "linux2":
-            #linux...
-            from pykeyboard import PyKeyboard
-            self._sendCommand = self._sendCommandLinux
-            self.k = PyKeyboard()
-        elif _platform == "win32":
-            # Windows...
-            import win32gui
-            import SendKeys
-            self._sendCommand = self._sendCommandWindows
-        else:
-            raw_input("Input platform unsupported or unknown: %s" % _platform)
-            sys.exit()
-        
         #Codes to use with SendKeys
         self._command = { 'a': 'a',
                         'b': 'b',
@@ -99,7 +83,7 @@ class SendInput:
                         'W': '+w',
                         'X': '+x',
                         'Y': '+y',
-                        'Z': '+y',
+                        'Z': '+z',
                         '0': '0',
                         '1': '1',
                         '2': '2',
@@ -155,6 +139,135 @@ class SendInput:
                         'right': '{RIGHT}',
                         'down': '{DOWN}',
         }
+        
+        #Codes to use with pyUserInput
+        self._command_pyUserInput = { 'a': 'a',
+                        'b': 'b',
+                        'c': 'c',
+                        'd': 'd',
+                        'e': 'e',
+                        'f': 'f',
+                        'g': 'g',
+                        'h': 'h',
+                        'i': 'i',
+                        'j': 'j',
+                        'k': 'k',
+                        'l': 'l',
+                        'm': 'm',
+                        'n': 'n',
+                        'o': 'o',
+                        'p': 'p',
+                        'q': 'q',
+                        'r': 'r',
+                        's': 's',
+                        't': 't',
+                        'u': 'u',
+                        'v': 'v',
+                        'w': 'w',
+                        'x': 'x',
+                        'y': 'y',
+                        'z': 'z',
+                        'A': 'A',
+                        'B': 'B',
+                        'C': 'C',
+                        'D': 'D',
+                        'E': 'E',
+                        'F': 'F',
+                        'G': 'G',
+                        'H': 'H',
+                        'I': 'I',
+                        'J': 'J',
+                        'K': 'K',
+                        'L': 'L',
+                        'M': 'M',
+                        'N': 'N',
+                        'O': 'O',
+                        'P': 'P',
+                        'Q': 'Q',
+                        'R': 'R',
+                        'S': 'S',
+                        'T': 'T',
+                        'U': 'U',
+                        'V': 'V',
+                        'W': 'W',
+                        'X': 'X',
+                        'Y': 'Y',
+                        'Z': 'Z',
+                        '0': '0',
+                        '1': '1',
+                        '2': '2',
+                        '3': '3',
+                        '4': '4',
+                        '5': '5',
+                        '6': '6',
+                        '7': '7',
+                        '8': '8',
+                        '9': '9',
+                        '!': '!',
+                        '"': '"',
+                        '#': '#',
+                        '$': '$',
+                        '%': '%',
+                        '&': '&',
+                        '\'': '\'',
+                        '(': '(',
+                        ')': ')',
+                        '*': '*',
+                        '+': '+',
+                        ',': ',',
+                        '-': '-',
+                        '.': '.',
+                        '/': '/',
+                        ':': ':',
+                        ';': ';',
+                        '<': '<',
+                        '=': '=',
+                        '>': '>',
+                        '?': '?',
+                        '@': '@',
+                        '[': '[',
+                        '\\': '\\',
+                        ']': ']',
+                        '^': '^',
+                        '_': '_',
+                        '`': '`',
+                        '{': '{',
+                        '|': '|',
+                        '}': '}',
+                        '~': '~',
+                        'tab': 'Tab',
+                        'enter': 'Return',
+                        'esc': 'Escape',
+                        'space': ' ',
+                        'pageup': 'Page_Up',
+                        'pagedown': 'Page_Down',
+                        'end': 'End',
+                        'home': 'Home',
+                        'left': 'Left',
+                        'up': 'Up',
+                        'right': 'Right',
+                        'down': 'Down',
+        }
+        
+        #Detect whether program is on Windows or Linux
+        from sys import platform as _platform
+        if _platform == "linux" or _platform == "linux2":
+            #linux...
+            from pykeyboard import PyKeyboard
+            self._sendCommand = self._sendCommandLinux
+            self._command = self._command_pyUserInput
+            self.k = PyKeyboard()
+        elif _platform == "win32":
+            # Windows...
+            import win32gui
+            import SendKeys
+            self._sendCommand = self._sendCommandWindows
+            self._command = self._command_SendKeys
+        else:
+            raw_input("Input platform unsupported or unknown: %s" % _platform)
+            sys.exit()
+        
+        
         
     
     def _sanitizeCommand(self, dirtyCommand):
