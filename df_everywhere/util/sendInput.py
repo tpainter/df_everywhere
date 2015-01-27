@@ -223,7 +223,7 @@ class SendInput:
                         ';': ';',
                         '<': 'less',
                         '=': '=',
-                        '>': 'greater',
+                        '>': '>',
                         '?': '?',
                         '@': '@',
                         '[': '[',
@@ -255,6 +255,7 @@ class SendInput:
         if _platform == "linux" or _platform == "linux2":
             #linux...
             from pykeyboard import PyKeyboard
+            import gtk.gdk
             self._sendCommand = self._sendCommandLinux
             self._command = self._command_pyUserInput
             self.k = PyKeyboard()
@@ -289,7 +290,8 @@ class SendInput:
         #with suppressOutput.suppress_stdout_stderr():
         #    self.hwnd.activate(0)
         if not self.hwnd.is_active():
-            self.hwnd.activate(0)
+            #self.hwnd.activate(0)
+            self.hwnd.activate(gtk.gdk.x11_get_server_time())
         self.k.tap_key(com)      
         
     def receiveCommand(self, dirtyCommand):
