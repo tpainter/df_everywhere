@@ -27,6 +27,7 @@ class SendInput:
     """
     
     def __init__(self, hwnd):
+        import suppressOutput
         
         #The window that commands are sent to
         self.hwnd = hwnd
@@ -285,7 +286,10 @@ class SendInput:
         #This makes the window active and sends keyboard events directly.
         #This is for linux only, but may work for Windows also.
         #print("Got: %s" % com)
-        self.hwnd.activate(int(time.time()))
+        #with suppressOutput.suppress_stdout_stderr():
+        #    self.hwnd.activate(0)
+        if not self.hwnd.is_active():
+            self.hwnd.activate(0)
         self.k.tap_key(com)      
         
     def receiveCommand(self, dirtyCommand):
