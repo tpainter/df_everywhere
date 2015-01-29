@@ -27,7 +27,6 @@ class SendInput:
     """
     
     def __init__(self, hwnd):
-        import suppressOutput
         
         #The window that commands are sent to
         self.hwnd = hwnd
@@ -255,7 +254,6 @@ class SendInput:
         if _platform == "linux" or _platform == "linux2":
             #linux...
             from pykeyboard import PyKeyboard
-            import gtk.gdk
             self._sendCommand = self._sendCommandLinux
             self._command = self._command_pyUserInput
             self.k = PyKeyboard()
@@ -286,12 +284,8 @@ class SendInput:
     def _sendCommandLinux(self, com):
         #This makes the window active and sends keyboard events directly.
         #This is for linux only, but may work for Windows also.
-        #print("Got: %s" % com)
-        #with suppressOutput.suppress_stdout_stderr():
-        #    self.hwnd.activate(0)
         import gtk.gdk
         if not self.hwnd.is_active():
-            #self.hwnd.activate(0)
             now = gtk.gdk.x11_get_server_time(gtk.gdk.get_default_root_window())
             self.hwnd.activate(now)
         self.k.tap_key(com)      
