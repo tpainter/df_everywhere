@@ -289,9 +289,11 @@ class SendInput:
         #print("Got: %s" % com)
         #with suppressOutput.suppress_stdout_stderr():
         #    self.hwnd.activate(0)
+        import gtk.gdk
         if not self.hwnd.is_active():
             #self.hwnd.activate(0)
-            self.hwnd.activate(gtk.gdk.x11_get_server_time())
+            now = gtk.gdk.x11_get_server_time(gtk.gdk.get_default_root_window())
+            self.hwnd.activate(now)
         self.k.tap_key(com)      
         
     def receiveCommand(self, dirtyCommand):
