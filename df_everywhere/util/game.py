@@ -312,7 +312,7 @@ class Game():
         
         if self.reconnecting:
             #don't try to reconnect if it has already been tried
-            prettyConsole.console('log', "skip")
+            prettyConsole.console('log', "Already reconnecting...")
             return
             
         
