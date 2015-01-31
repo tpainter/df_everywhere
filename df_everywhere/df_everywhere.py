@@ -60,7 +60,7 @@ if __name__ == "__main__":
         try:
             show_fps = Config.getboolean('dfeverywhere', 'FPS')
         except:
-            show_fps = False
+            show_fps = True
     except:
         #If file is missing, return blanks
         web_topic = ''
