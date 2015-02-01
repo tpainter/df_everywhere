@@ -32,7 +32,7 @@ class SendInput:
         self.hwnd = hwnd
         
         #Codes to use with SendKeys
-        self._command = { 'a': 'a',
+        self._command_SendKeys = { 'a': 'a',
                         'b': 'b',
                         'c': 'c',
                         'd': 'd',
