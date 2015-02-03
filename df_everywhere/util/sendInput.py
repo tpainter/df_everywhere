@@ -277,6 +277,8 @@ class SendInput:
     def _sendCommandWindows(self, com):
         #This makes the window active and sends keyboard events directly.
         #Windows only.
+        import win32gui
+        import SendKeys
         #print("Got: %s" % com)
         result = win32gui.SetForegroundWindow(self.hwnd)
         SendKeys.SendKeys(com)   
