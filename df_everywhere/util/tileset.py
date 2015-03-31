@@ -1,5 +1,5 @@
 # DF Everywhere
-# Copyright (C) 2014  Travis Painter
+# Copyright (C) 2015  Travis Painter
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class Tileset:
         
         if filename is None:
             #fake a filename
-            self.filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, 0)
+            self.filename = "%02dx%02d-%05d.png" % (self.tile_x, self.tile_y, 0)
             img = None
         else:
             self.filename = filename
@@ -148,6 +148,9 @@ class Tileset:
             pass
         else:
             prettyConsole.console('log', "Add tile error: tile dimensions do not match tileset")
+            prettyConsole.console('log', "Add tile error: pTile_x = %d, self.tile_x = %d" % (pTile_x, self.tile_x))
+            prettyConsole.console('log', "Add tile error: pTile_y = %d, self.tile_y = %d" % (pTile_y, self.tile_y))
+            exit()
             return
             
         if self.tileset is not None:
@@ -188,7 +191,7 @@ class Tileset:
         new_y = newTilePosition / maxTiles_x * self.tile_y
         newTileSet.paste(img, (new_x, new_y))
         
-        filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
+        filename = "%02dx%02d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
         
         #reload new tileset
         self.tileCount += 1
@@ -302,7 +305,7 @@ class Tileset:
 
         blocks=numpy.lib.stride_tricks.as_strided(img_arr, shape=shape, strides=strides)
         
-        a = blocks.reshape([-1,self.tile_x,self.tile_y,3])
+        a = blocks.reshape([-1,self.tile_y,self.tile_x,3])
         
         row = []
         i = 0
