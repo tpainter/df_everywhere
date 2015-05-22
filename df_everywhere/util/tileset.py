@@ -46,7 +46,7 @@ class Tileset:
         
         if filename is None:
             #fake a filename
-            self.filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, 0)
+            self.filename = "%02dx%02d-%05d.png" % (self.tile_x, self.tile_y, 0)
             img = None
         else:
             self.filename = filename
@@ -188,7 +188,7 @@ class Tileset:
         new_y = newTilePosition / maxTiles_x * self.tile_y
         newTileSet.paste(img, (new_x, new_y))
         
-        filename = "%dx%d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
+        filename = "%02dx%02d-%05d.png" % (self.tile_x, self.tile_y, newTilePosition)
         
         #reload new tileset
         self.tileCount += 1
