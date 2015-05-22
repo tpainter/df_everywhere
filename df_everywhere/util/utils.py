@@ -1,5 +1,5 @@
 # DF Everywhere
-# Copyright (C) 2014  Travis Painter
+# Copyright (C) 2015  Travis Painter
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -234,19 +234,25 @@ def findTileSize(img):
     tile_y = initial_guess
     px, py = img.size
     
-    #The tiles should be square
+    #The tiles do not need to be square
     for x in range(initial_guess, 0, -1):
-        if (px % x == 0) and (py % x == 0):
+        if (px % x == 0):
             tile_x = x
-            tile_y = x
+            break
+        else:
+            continue
+            
+    for y in range(initial_guess, 0, -1):
+        if (py % y == 0):
+            tile_y = y
             break
         else:
             continue
     
-    print("Tile size found: %dx%d" % (tile_x, tile_y))
-    if tile_x < 7:
-        print("Error: Tile size too small")
-        return 0, 0
+    print("Tile size found: %02dx%02d" % (tile_x, tile_y))
+    #if tile_x < 7:
+    #    print("Error: Tile size too small")
+    #    return 0, 0
     
     return tile_x, tile_y
     

@@ -1,5 +1,5 @@
 # DF Everywhere
-# Copyright (C) 2014  Travis Painter
+# Copyright (C) 2015  Travis Painter
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ def welcome():
     print("DF Everywhere - Play Dwarf Fortress from your browser.\n"
           "www.dfeverywhere.com\n"
           "\n"
-          "Version:0.1.7\n"
+          "Version:0.1.8\n"
           "For questions, check the topic on the official Dwarf fortress Forums or email:\n"
           "   www.bay12forums.com/smf/index.php?topic=139975.0\n"
           "   dwarfeverywhere@gmail.com\n")
