@@ -173,6 +173,7 @@ def linux_screenshot(wnck_win = None, debug = False):
     import gtk, wnck
     import gtk.gdk
     import time
+    import gc
     
     root_win = gtk.gdk.get_default_root_window()
     w = wnck_win
@@ -186,16 +187,25 @@ def linux_screenshot(wnck_win = None, debug = False):
         #If it is, don't bother taking a screen shot.
         return None
 
-    pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,w.get_client_window_geometry()[2], w.get_client_window_geometry()[3])
-    pb = pb.get_from_drawable(root_win,root_win.get_colormap(),w.get_client_window_geometry()[0],w.get_client_window_geometry()[1],0,0,w.get_client_window_geometry()[2],w.get_client_window_geometry()[3])
-    if (pb != None):
+    pb1 = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,w.get_client_window_geometry()[2], w.get_client_window_geometry()[3])
+    pb2 = pb1.get_from_drawable(root_win,root_win.get_colormap(),w.get_client_window_geometry()[0],w.get_client_window_geometry()[1],0,0,w.get_client_window_geometry()[2],w.get_client_window_geometry()[3])
+    if (pb2 != None):
         if debug:
-            pb.save("screenshot_gtk.png","png")
+            pb2.save("screenshot_gtk.png","png")
             print "Screenshot saved to screenshot_gtk.png."
         
-        width, height = pb.get_width(),pb.get_height()
-        return Image.fromstring("RGB",(width,height),pb.get_pixels() )
+        width, height = pb2.get_width(),pb2.get_height()
+        game_image = Image.fromstring("RGB",(width,height),pb2.get_pixels() )
+        #See: http://faq.pygtk.org/index.py?req=show&file=faq08.004.htp for method to avoid memory leak.
+        del pb1
+        del pb2
+        gc.collect()
+        
+        return game_image
     else:
+        del pb1
+        del pb2
+        gc.collect()
         print "Unable to get the screenshot."
     
 def findLocalImg(x, y):
