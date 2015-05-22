@@ -144,16 +144,22 @@ class Game():
         """
         Subscribes to incomming commands.
         """
-        d = yield self.connection[0].subscribe(self.controlWindow.receiveCommand, '%s.commands' % self.topicPrefix)
-        self.subscriptions['commands'] = d
+        try:
+            d = yield self.connection[0].subscribe(self.controlWindow.receiveCommand, '%s.commands' % self.topicPrefix)
+            self.subscriptions['commands'] = d
+        except:
+            prettyConsole.console('log', 'Command sub error')
     
     @inlineCallbacks
     def _subscribeHeartbeats(self):
         """
         Subscribes to incomming heartbeats.
         """
-        d = yield self.connection[0].subscribe(self._receiveHeartbeats, '%s.heartbeats' % self.topicPrefix)
-        self.subscriptions['heartbeats'] = d
+        try:
+            d = yield self.connection[0].subscribe(self._receiveHeartbeats, '%s.heartbeats' % self.topicPrefix)
+            self.subscriptions['heartbeats'] = d
+        except:
+            prettyConsole.console('log', 'Heartbeat sub error')
         
     def _receiveHeartbeats(self, recv):
         """
