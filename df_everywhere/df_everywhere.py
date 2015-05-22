@@ -57,10 +57,16 @@ if __name__ == "__main__":
             Config.read("dfeverywhere.conf")
         web_topic = Config.get('dfeverywhere', 'TOPIC')
         web_key = Config.get('dfeverywhere', 'KEY')
+        
+        #Check optional values
         try:
             show_fps = Config.getboolean('dfeverywhere', 'FPS')
         except:
             show_fps = True
+        try:
+            full_debug = Config.getboolean('dfeverywhere', 'DEBUG')
+        except:
+            full_debug = False
     except:
         #If file is missing, return blanks
         web_topic = ''
