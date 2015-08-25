@@ -79,7 +79,7 @@ def win_screenshot(hwnd = None, debug = False):
             (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
             bmpstr, 'raw', 'BGRX', 0, 1)
     except:
-        print("Dwarf Fortress window must not be minimized.")
+        print("Dwarf Fortress window must not be minimized or run from remote desktop.")
         result = 0
     
     win32gui.DeleteObject(saveBitMap.GetHandle())
@@ -226,7 +226,7 @@ def findLocalImg(x, y):
     fileList_sorted = sorted(fileList, key=lambda tup: tup[0], reverse = True)
     
     if fileList == []:
-        print("Didn't find appropriate tileset image. Continuing")
+        print("Didn't find appropriate tileset image. Will create one.")
         return None
     else:
         print("Found tileset image: %s" % fileList_sorted[0][1])
