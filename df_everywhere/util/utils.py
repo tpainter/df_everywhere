@@ -226,45 +226,86 @@ def findLocalImg(x, y):
     fileList_sorted = sorted(fileList, key=lambda tup: tup[0], reverse = True)
     
     if fileList == []:
-        print("Didn't find appropriate tileset image. Will create one.")
+        print("Didn't find appropriate existing tileset image. Will create one.")
         return None
     else:
         print("Found tileset image: %s" % fileList_sorted[0][1])
         return fileList_sorted[0][1]
         
-def findTileSize(img):
+def findTileSize(img, method = 2):
     """
-    Tries to automatically find the tile size
+    Tries to automatically find the tile size.
+    
+    1 = Brute (Finds first even division)
+    2 = Smarter (makes assumptions based on minimum number of tiles) 
     """
     
-    #start with 16x16 tile
-    initial_guess = 16
-    
-    tile_x = initial_guess
-    tile_y = initial_guess
-    px, py = img.size
-    
-    #The tiles do not need to be square
-    for x in range(initial_guess, 0, -1):
-        if (px % x == 0):
-            tile_x = x
-            break
+    if method == 1:
+        #brute
+        #start with 16x16 tile
+        initial_guess = 16
+        
+        tile_x = initial_guess
+        tile_y = initial_guess
+        px, py = img.size
+        
+        #The tiles do not need to be square
+        for x in range(initial_guess, 0, -1):
+            if (px % x == 0):
+                tile_x = x
+                break
+            else:
+                continue
+                
+        for y in range(initial_guess, 0, -1):
+            if (py % y == 0):
+                tile_y = y
+                break
+            else:
+                continue
+        
+        print("Tile size found: %02dx%02d" % (tile_x, tile_y))
+        #if tile_x < 7:
+        #    print("Error: Tile size too small")
+        #    return 0, 0
+        
+        return tile_x, tile_y
+    elif method == 2:
+        #smart
+        
+        #Minimum number of tiles that will be shown in a window, i.e. 25x80
+        MinTilesY = 25
+        MinTilesX = 80
+        
+        MaxTileSizeX = 16
+        MaxTileSizeY = 16
+        
+        #pixels in window
+        px, py = img.size
+        
+        #Check if max tile size works
+        if (py/MaxTileSizeY) >= MinTilesY:
+            tile_y = MaxTileSizeY
         else:
-            continue
+            tile_y = py/MinTilesY
             
-    for y in range(initial_guess, 0, -1):
-        if (py % y == 0):
-            tile_y = y
-            break
+        if (px/MaxTileSizeX) >= MinTilesX:
+            tile_x = MaxTileSizeX
         else:
-            continue
-    
-    print("Tile size found: %02dx%02d" % (tile_x, tile_y))
-    #if tile_x < 7:
-    #    print("Error: Tile size too small")
-    #    return 0, 0
-    
-    return tile_x, tile_y
+            tile_x = px/MinTilesX
+        
+        #Try to keep tile square
+        if tile_x > tile_y:
+            tile_x = tile_y
+        
+        if tile_y > tile_x:
+            tile_y = tile_x
+        
+        print("Tile size found: %02dx%02d" % (tile_x, tile_y))
+        return tile_x, tile_y
+    else:
+        print("Error: Unknown findTileSize method.")
+        return None
     
 def trim(im, debug = False):
     """ 
