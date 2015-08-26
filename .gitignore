@@ -1,0 +1,11 @@
+# All compiled python scripts
+*.pyc
+
+# All .png images (tilesets)
+*.png
+
+# This file.
+#.gitignore
+
+#localTest
+localTest
