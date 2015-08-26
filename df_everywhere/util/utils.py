@@ -268,7 +268,7 @@ def findTileSize(img, method = 2):
         #if tile_x < 7:
         #    print("Error: Tile size too small")
         #    return 0, 0
-        
+        print("Image size: %d, %d" % (px, py))
         return tile_x, tile_y
     elif method == 2:
         #smart
@@ -283,23 +283,22 @@ def findTileSize(img, method = 2):
         #pixels in window
         px, py = img.size
         
+        print("Image size: %d, %d" % (px, py))
+        
         #Check if max tile size works
-        if (py/MaxTileSizeY) >= MinTilesY:
+        if ((py/MaxTileSizeY) >= MinTilesY) and ((px/MaxTileSizeX) >= MinTilesX):
             tile_y = MaxTileSizeY
-        else:
-            tile_y = py/MinTilesY
-            
-        if (px/MaxTileSizeX) >= MinTilesX:
             tile_x = MaxTileSizeX
         else:
-            tile_x = px/MinTilesX
-        
-        #Try to keep tile square
-        if tile_x > tile_y:
-            tile_x = tile_y
-        
-        if tile_y > tile_x:
-            tile_y = tile_x
+            #look for square tile size
+            print("Tile size isn't max...")
+            for i in range(MaxTileSizeY, 2, -1):
+                if (py%i == 0) and (px%i == 0):
+                    tile_y = i
+                    tile_x = i
+                    break
+            else:
+                print("Didn't find a square tile size.")
         
         print("Tile size found: %02dx%02d" % (tile_x, tile_y))
         return tile_x, tile_y
