@@ -283,7 +283,7 @@ def findTileSize(img, method = 2):
         #pixels in window
         px, py = img.size
         
-        print("Image size: %d, %d" % (px, py))
+        print("Trimmed image size: %d, %d" % (px, py))
         
         #Check if max tile size works
         if ((py/MaxTileSizeY) >= MinTilesY) and ((px/MaxTileSizeX) >= MinTilesX):
