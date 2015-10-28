@@ -193,7 +193,7 @@ class Game():
         Handles periodically running screen grabs.
         """
         try:
-            shot = self.shotFunction(self.window_hnd, debug = False)
+            shot = self.shotFunction(debug = False)
             #Need to check that an image was returned.
             shot_x, shot_y = shot.size
         except:

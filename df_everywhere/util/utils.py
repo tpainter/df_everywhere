@@ -23,76 +23,8 @@ except:
     from PIL import ImageChops
 
 import os
-    
-
-def win_get_windows_bytitle(title_text, exact = False):    
-    """
-    Gets details of window position by title text. [Windows Only]
-    """   
-    
-    import win32gui
-    
-    def _window_callback(hwnd, all_windows):
-        all_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
-    windows = []
-    win32gui.EnumWindows(_window_callback, windows)
-    if exact:
-        return [hwnd for hwnd, title in windows if title_text == title]
-    else:
-        return [hwnd for hwnd, title in windows if title_text in title]
-        
-def win_screenshot(hwnd = None, debug = False):
-    """
-    Takes a screenshot of only the area given by the window.
-    """   
-    
-    import win32gui
-    import win32ui
-    from ctypes import windll
+       
      
-    if not hwnd:
-        print("Unable to get window. Exiting.")
-        exit()
-    
-    left, top, right, bot = win32gui.GetClientRect(hwnd)
-    w = right - left
-    h = bot - top
-    
-    hwndDC = win32gui.GetWindowDC(hwnd)
-    mfcDC  = win32ui.CreateDCFromHandle(hwndDC)
-    saveDC = mfcDC.CreateCompatibleDC()
-    
-    saveBitMap = win32ui.CreateBitmap()
-    saveBitMap.CreateCompatibleBitmap(mfcDC, w, h)
-    
-    saveDC.SelectObject(saveBitMap)
-    
-    result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 1)
-    
-    bmpinfo = saveBitMap.GetInfo()
-    bmpstr = saveBitMap.GetBitmapBits(True)
-    
-    #If the window is minimized, no useful image data is received. Check this
-    try:
-        img = Image.frombuffer(
-            'RGB',
-            (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
-            bmpstr, 'raw', 'BGRX', 0, 1)
-    except:
-        print("Dwarf Fortress window must not be minimized or run from remote desktop.")
-        result = 0
-    
-    win32gui.DeleteObject(saveBitMap.GetHandle())
-    saveDC.DeleteDC()
-    mfcDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, hwndDC)
-
-    if result == 1:
-        #PrintWindow Succeeded
-        #img.save("test.png")
-        return img      
-    
-        
 def win_screenshot_old(hwnd = None, debug = False):
     """
     Takes a screenshot of only the area given by the window.
@@ -140,73 +72,6 @@ def win_screenshot_old(hwnd = None, debug = False):
         #webbrowser.open(filename)
     
     return img
-    
-def linux_get_windows_bytitle(title_text, exact = False):
-    """
-    Finds a linux (Gtk) window by title. Returns window.
-    """
-    
-    import gtk, wnck
- 
-    default = wnck.screen_get_default()
-
-    while gtk.events_pending():
-        gtk.main_iteration(False)
-
-    window_list = default.get_windows()
-
-    if len(window_list) == 0:
-        print "No Windows Found"
-    for win in window_list:
-        if exact:
-            if win.get_name() == title_text:
-                return win
-        else:
-            if title_text in win.get_name():
-                return win
-    
-def linux_screenshot(wnck_win = None, debug = False):
-    """
-    Takes a screenshot of the given window on linux using Gtk.
-    """
-    
-    import gtk, wnck
-    import gtk.gdk
-    import time
-    import gc
-    
-    root_win = gtk.gdk.get_default_root_window()
-    w = wnck_win
-    w.activate(int(time.time()))
-    #Should not need to sleep, but works for now.
-    #time.sleep(1)
-    #Maybe just needs a flush()?
-    
-    #Check to see if a window is above the target window
-    if w.is_below():
-        #If it is, don't bother taking a screen shot.
-        return None
-
-    pb1 = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,w.get_client_window_geometry()[2], w.get_client_window_geometry()[3])
-    pb2 = pb1.get_from_drawable(root_win,root_win.get_colormap(),w.get_client_window_geometry()[0],w.get_client_window_geometry()[1],0,0,w.get_client_window_geometry()[2],w.get_client_window_geometry()[3])
-    if (pb2 != None):
-        if debug:
-            pb2.save("screenshot_gtk.png","png")
-            print "Screenshot saved to screenshot_gtk.png."
-        
-        width, height = pb2.get_width(),pb2.get_height()
-        game_image = Image.fromstring("RGB",(width,height),pb2.get_pixels() )
-        #See: http://faq.pygtk.org/index.py?req=show&file=faq08.004.htp for method to avoid memory leak.
-        del pb1
-        del pb2
-        gc.collect()
-        
-        return game_image
-    else:
-        del pb1
-        del pb2
-        gc.collect()
-        print "Unable to get the screenshot."
     
 def findLocalImg(x, y):
     """

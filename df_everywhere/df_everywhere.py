@@ -25,10 +25,11 @@ if __name__ == "__main__":
     from sys import platform as _platform
     import time
     import ConfigParser
+    
     from twisted.internet import reactor
     from twisted.internet.defer import inlineCallbacks    
     
-    from util import wamp_local, utils, tileset, sendInput, messages, game, consoleInput
+    from util import wamp_local, utils, tileset, sendInput, messages, game, consoleInput, screenshot
     
     #Change this to True for enhanced debugging    
     edebug = False
@@ -78,37 +79,8 @@ if __name__ == "__main__":
         raw_input('DF Everywhere stopped. Press [enter] to close this window.')
         sys.exit()
     
-            
-    #Change screenshot method based on operating system    
-    if _platform == "linux" or _platform == "linux2":
-        #linux...
-        window_handle = []
-        window_handle.append(utils.linux_get_windows_bytitle("Dwarf Fortress"))
-        try:
-            shot = utils.linux_screenshot(window_handle[0], debug = False)
-            shotFunct = utils.linux_screenshot
-        except:
-            print("Unable to find Dwarf Fortress window. Ensure that it is running.")
-            raw_input('DF Everywhere stopped. Press [enter] to close this window.')
-            sys.exit()
-    elif _platform == "darwin":
-        print("OS X unsupported at this time. Exiting...")
-        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
-        sys.exit()
-    elif _platform == "win32":
-        # Windows...
-        window_handle = utils.win_get_windows_bytitle("Dwarf Fortress")            
-        try:
-            shot = utils.win_screenshot(window_handle[0], debug = False)
-            shotFunct = utils.win_screenshot
-        except:
-            print("Unable to find Dwarf Fortress window. Ensure that it is running.")
-            raw_input('DF Everywhere stopped. Press [enter] to close this window.')
-            sys.exit()
-    else:
-        print("Unsupported platform detected. Exiting...")
-        raw_input('DF Everywhere stopped. Press [enter] to close this window.')
-        sys.exit()
+    screen_shot = screenshot.ScreenShot("Dwarf Fortress")
+    shot = screen_shot.get_screen_shot()
     
     try:
         print("Full image size: %d, %d" % shot.size)
@@ -130,7 +102,7 @@ if __name__ == "__main__":
         i = 0
         while True:
             i+= 1
-            shot = shotFunct(window_handle[0], debug = False)
+            shot = screen_shot.get_screen_shot()
             trimmedShot = utils.trim(shot, debug = False)
             if trimmedShot is not None:
                 tile_x, tile_y = utils.findTileSize(trimmedShot)
@@ -148,7 +120,7 @@ if __name__ == "__main__":
     tset = tileset.Tileset(local_file, tile_x, tile_y, array = True, debug = False)
     
     #Start WAMP client
-    client_control = game.Game(web_topic, web_key, shotFunct, window_handle[0], fps = show_fps)    
+    client_control = game.Game(web_topic, web_key, screen_shot.get_screen_shot, screen_shot.window_handle, fps = show_fps)    
     client_control.tileset = tset
     
     #Start input handler
