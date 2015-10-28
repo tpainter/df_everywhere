@@ -217,7 +217,7 @@ class Game():
                 #tileMap = yield threads.deferToThread(self.tileset.parseImageArray, trimmedShot, returnFullMap = False)
         else:
             #If there was an error getting the tilemap, fake one.
-            prettyConsole.console('log', "Image error. Try moving Dwarf Fortress window to main display.")
+            prettyConsole.console('log', "Error reading game window.")
             tileMap = []
         
         self._sendTileMap(tileMap)

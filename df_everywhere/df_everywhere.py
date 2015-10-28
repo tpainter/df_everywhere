@@ -111,9 +111,17 @@ if __name__ == "__main__":
         sys.exit()
     
     try:
+        print("Full image size: %d, %d" % shot.size)
+        if full_debug:
+            print("Saving initial window image to debug1.png...")
+            shot.save("debug1.png")
         trimmedShot = utils.trim(shot, debug = False)
+        if full_debug:
+            print("Saving trimmed window image to debug2.png...")
+            trimmedShot.save("debug2.png")
         tile_x, tile_y = utils.findTileSize(trimmedShot)
-    except:
+    except Exception, e:
+        print e
         print("Error getting screenshot. Exiting.")
         sys.exit()
     

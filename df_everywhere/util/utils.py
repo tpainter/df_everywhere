@@ -79,7 +79,7 @@ def win_screenshot(hwnd = None, debug = False):
             (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
             bmpstr, 'raw', 'BGRX', 0, 1)
     except:
-        print("Dwarf Fortress window must not be minimized.")
+        print("Dwarf Fortress window must not be minimized or run from remote desktop.")
         result = 0
     
     win32gui.DeleteObject(saveBitMap.GetHandle())
@@ -226,45 +226,85 @@ def findLocalImg(x, y):
     fileList_sorted = sorted(fileList, key=lambda tup: tup[0], reverse = True)
     
     if fileList == []:
-        print("Didn't find appropriate tileset image. Continuing")
+        print("Didn't find appropriate existing tileset image. Will create one.")
         return None
     else:
         print("Found tileset image: %s" % fileList_sorted[0][1])
         return fileList_sorted[0][1]
         
-def findTileSize(img):
+def findTileSize(img, method = 2):
     """
-    Tries to automatically find the tile size
+    Tries to automatically find the tile size.
+    
+    1 = Brute (Finds first even division)
+    2 = Smarter (makes assumptions based on minimum number of tiles) 
     """
     
-    #start with 16x16 tile
-    initial_guess = 16
-    
-    tile_x = initial_guess
-    tile_y = initial_guess
-    px, py = img.size
-    
-    #The tiles do not need to be square
-    for x in range(initial_guess, 0, -1):
-        if (px % x == 0):
-            tile_x = x
-            break
+    if method == 1:
+        #brute
+        #start with 16x16 tile
+        initial_guess = 16
+        
+        tile_x = initial_guess
+        tile_y = initial_guess
+        px, py = img.size
+        
+        #The tiles do not need to be square
+        for x in range(initial_guess, 0, -1):
+            if (px % x == 0):
+                tile_x = x
+                break
+            else:
+                continue
+                
+        for y in range(initial_guess, 0, -1):
+            if (py % y == 0):
+                tile_y = y
+                break
+            else:
+                continue
+        
+        print("Tile size found: %02dx%02d" % (tile_x, tile_y))
+        #if tile_x < 7:
+        #    print("Error: Tile size too small")
+        #    return 0, 0
+        print("Image size: %d, %d" % (px, py))
+        return tile_x, tile_y
+    elif method == 2:
+        #smart
+        
+        #Minimum number of tiles that will be shown in a window, i.e. 25x80
+        MinTilesY = 25
+        MinTilesX = 80
+        
+        MaxTileSizeX = 16
+        MaxTileSizeY = 16
+        
+        #pixels in window
+        px, py = img.size
+        
+        print("Trimmed image size: %d, %d" % (px, py))
+        
+        #Check if max tile size works
+        if ((py/MaxTileSizeY) >= MinTilesY) and ((px/MaxTileSizeX) >= MinTilesX):
+            tile_y = MaxTileSizeY
+            tile_x = MaxTileSizeX
         else:
-            continue
-            
-    for y in range(initial_guess, 0, -1):
-        if (py % y == 0):
-            tile_y = y
-            break
-        else:
-            continue
-    
-    print("Tile size found: %02dx%02d" % (tile_x, tile_y))
-    #if tile_x < 7:
-    #    print("Error: Tile size too small")
-    #    return 0, 0
-    
-    return tile_x, tile_y
+            #look for square tile size
+            print("Tile size isn't max...")
+            for i in range(MaxTileSizeY, 2, -1):
+                if (py%i == 0) and (px%i == 0):
+                    tile_y = i
+                    tile_x = i
+                    break
+            else:
+                print("Didn't find a square tile size.")
+        
+        print("Tile size found: %02dx%02d" % (tile_x, tile_y))
+        return tile_x, tile_y
+    else:
+        print("Error: Unknown findTileSize method.")
+        return None
     
 def trim(im, debug = False):
     """ 
