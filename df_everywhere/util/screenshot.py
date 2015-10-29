@@ -147,8 +147,11 @@ class ScreenShot():
         #Copy window image to new gdk pixelbuffer
         pb2 = Gdk.pixbuf_get_from_window(w_gdk, 0, 0, width, height)
 
-        if (pb2 != None):
-            shot = Image.fromstring("RGBA",(width,height),pb2.get_pixels() )
+        if (pb2 in not None):
+            if pb2.get_has_alpha():
+                shot = Image.fromstring("RGBA",(width,height),pb2.get_pixels() )
+            else:
+                shot = Image.fromstring("RGB",(width,height),pb2.get_pixels() )
             if debug:
                 shot.save("test.png", "png")
             return shot
